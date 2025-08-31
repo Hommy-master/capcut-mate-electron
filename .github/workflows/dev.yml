@@ -2,10 +2,10 @@ name: Build
 
 on:
   push:
-    branches: [ main ]    # 在推送到 main 分支时触发
+    branches: [ main, master ]
+    tags: [ 'v*' ]
   pull_request:
-    branches: [ main ]    # 在向 main 分支提 PR 时触发
-  workflow_dispatch:      # 允许手动触发工作流
+    branches: [ main, master ]
 
 jobs:
   build:
