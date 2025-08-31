@@ -20,9 +20,9 @@ jobs:
           - os: windows-latest
             platform: win
             artifact_name: windows-build
-          - os: macos-latest
-            platform: mac
-            artifact_name: macos-build
+          #- os: macos-latest
+          #  platform: mac
+          #  artifact_name: macos-build
 
     steps:
       - name: 准备代码
