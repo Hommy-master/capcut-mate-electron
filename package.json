@@ -13,6 +13,9 @@
     "electron": "^36.8.1",
     "electron-builder": "^25.1.8"
   },
+  "build": {
+    "publish": "never"
+  },
   "author": "gogoshine",
   "license": "MIT"
 }
