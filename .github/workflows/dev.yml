@@ -14,9 +14,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            platform: linux
-            artifact_name: linux-build
+          #- os: ubuntu-latest
+          #  platform: linux
+          #  artifact_name: linux-build
           - os: windows-latest
             platform: win
             artifact_name: windows-build
