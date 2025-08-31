@@ -14,7 +14,10 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "publish": "never"
+    "appId": "com.gogoshine.capcut-mate",
+    "productName": "剪映小助手",
+    "win": { "target": "nsis" },
+    "publish": false
   },
   "author": "gogoshine",
   "license": "MIT"
