@@ -9,7 +9,7 @@ set ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/
 # 切换yarn镜像源 - 适用于linux 或 mac
 export ELECTRON_MIRROR="https://npmmirror.com/mirrors/electron/"
 # 安装依赖
-npm install
+npm install --verbose
 ```
 2. 启动项目
 ```bash
