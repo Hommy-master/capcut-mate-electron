@@ -1,0 +1,49 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]    # 在推送到 main 分支时触发
+  pull_request:
+    branches: [ main ]    # 在向 main 分支提 PR 时触发
+  workflow_dispatch:      # 允许手动触发工作流
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest] # 构建矩阵：在三台不同的 runner 上运行作业
+
+    steps:
+      - name: 准备代码
+        uses: actions/checkout@v4
+
+      - name: 设置Node.js环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22' # 使用 Node.js 22 LTS，你可以根据需求调整
+          cache: 'npm'
+
+      - name: 安装依赖
+        run: npm ci         # 使用 ci 而不是 install，以获得更准确和更快的依赖安装
+
+      - name: 打包
+        run: npm run build  # 执行 package.json 中定义的 build 脚本
+
+      - name: 压缩文件
+        run: |
+          cd dist && tar -czvf ../${{ matrix.os }}.tar.gz ./* && cd -
+          ls 
+    
+      - name: 上传文件
+        # 仅当推送以 'v' 开头的标签时执行（例如 v1.0.0）
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: ${{ matrix.os }}.tar.gz
+          overwrite: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
