@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Hello Electron</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        .platform {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hello Electron!</h1>
+    <p>这是一个简单的Electron应用程序</p>
+    <div class="platform">运行在: <span id="platform"></span></div>
+
+    <script>
+        // 显示当前平台信息
+        document.getElementById('platform').textContent = process.platform;
+    </script>
+</body>
+</html>
