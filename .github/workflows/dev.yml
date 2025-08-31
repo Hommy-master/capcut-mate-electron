@@ -13,7 +13,16 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest] # 构建矩阵：在三台不同的 runner 上运行作业
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            artifact_name: linux-build
+          - os: windows-latest
+            platform: win
+            artifact_name: windows-build
+          - os: macos-latest
+            platform: mac
+            artifact_name: macos-build
 
     steps:
       - name: 准备代码
@@ -27,13 +36,13 @@ jobs:
 
       - name: 安装依赖
         run: npm ci         # 使用 ci 而不是 install，以获得更准确和更快的依赖安装
-
-      - name: 打包
-        run: npm run build  # 执行 package.json 中定义的 build 脚本
+      
+      - name: 根据平台打包
+        run: npm run build-${{ matrix.platform }}
 
       - name: 压缩文件
         run: |
-          cd dist && tar -czvf ../${{ matrix.os }}.tar.gz ./* && cd -
+          cd dist && tar -czvf ../${{ matrix.artifact_name }}.tar.gz ./* && cd -
           ls 
     
       - name: 上传文件
@@ -43,7 +52,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          files: ${{ matrix.os }}.tar.gz
+          files: ${{ matrix.artifact_name }}.tar.gz
           overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
