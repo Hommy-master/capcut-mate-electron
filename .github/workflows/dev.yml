@@ -38,7 +38,7 @@ jobs:
         run: npm ci         # 使用 ci 而不是 install，以获得更准确和更快的依赖安装
       
       - name: 根据平台打包
-        run: npm run build-${{ matrix.platform }}
+        run: npm run build-${{ matrix.platform }} -- --publish=never
 
       - name: 压缩文件
         run: |
