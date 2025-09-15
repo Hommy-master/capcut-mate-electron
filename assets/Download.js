@@ -93,12 +93,26 @@ async function initDownload() {
     const logData = await window.electronAPI.getLogData();
     if (logData && logData.length > 0) {
         logData.forEach((logEntry) => {
-            addLog(logEntry);
+            addLog(logEntry, false);
+        });
+    }
+
+    function removeListIcon() {
+        const existingItems = logList.querySelectorAll(".log-item");
+
+        existingItems.forEach((item) => {
+            const iconItem = item.querySelector(".log-icon");
+
+            const oldLevel = Array.from(iconItem.classList).find((cls) =>
+                ["loading", "show"].includes(cls)
+            );
+
+            iconItem.classList.remove(oldLevel);
         });
     }
 
     // 添加日志函数
-    function addLog({ message, time, level = "info" }) {
+    function addLog({ message, time, level = "info" }, isNew = true) {
         emptyLog.classList.add("hide");
         logList.classList.remove("hide");
 
@@ -111,24 +125,15 @@ async function initDownload() {
         };
 
         const logItem = document.createElement("li");
+        const iconClass = isNew ? `${level} show` : '';
         logItem.className = `log-item ${level}`;
         logItem.innerHTML = `
                                 <span class="log-time">[${time}] </span>
-                                <i class="${logIconMap[level]} ${level} show log-icon"></i>
+                                <i class="${logIconMap[level]} ${iconClass} log-icon"></i>
                                 <span class="log-message">${message}</span>
                             `;
 
-        const existingItems = logList.querySelectorAll(".log-item");
-
-        existingItems.forEach((item) => {
-            const iconItem = item.querySelector(".log-icon");
-
-            const oldLevel = Array.from(iconItem.classList).find((cls) =>
-                ["loading", "show"].includes(cls)
-            );
-
-            iconItem.classList.remove(oldLevel);
-        });
+        removeListIcon();
 
         // 将新日志添加到顶部
         logList.appendChild(logItem);
