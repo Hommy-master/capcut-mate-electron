@@ -9,7 +9,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     getUrlJsonData: (url) => ipcRenderer.invoke('get-url-json-data', url),
 
-    getTargetDir: () => ipcRenderer.invoke('get-target-dir'),
+    getLogData: () => ipcRenderer.invoke('get-log-data'),
+
+    clearLogData: () => ipcRenderer.invoke('clear-log-data'),
 
     // 监听来自主进程的日志消息
     onFileOperationLog: (callback) => {
@@ -18,10 +20,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
             callback(logEntry);
         });
     },
+
     // 清理监听器，避免内存泄漏
     removeAllFileOperationLogListeners: () => {
         ipcRenderer.removeAllListeners('file-operation-log');
     },
-    // 示例：也暴露一个调用主进程操作的方法（如果你使用 invoke/handle 方式）
-    performWrite: (filePath, data) => ipcRenderer.invoke('perform-write', filePath, data)
 });

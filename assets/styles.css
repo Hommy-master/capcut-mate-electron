@@ -243,7 +243,12 @@ h1 {
     border-radius: 50%;
 }
 
-input:checked+.slider {
+input:disabled+.slider {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+input:checked:not(:disabled)+.slider {
     background-color: #2196f3;
 }
 
@@ -326,11 +331,11 @@ input:checked+.slider:before {
     display: flex;
     align-items: center;
     gap: 10px;
+    font-size: 1rem;
 }
 
 .log-time {
     color: #7f8c8d;
-    font-size: 0.75rem;
 }
 
 .log-item .log-icon:not(.show) {
@@ -358,9 +363,14 @@ i.log-icon.error {
     color: #e74c3c;
 }
 
+.log-message {
+    flex: 1;
+    word-break: break-word;
+}
 .log-item:last-child {
     border-bottom: none;
 }
+
 
 
 /* 响应式设计 */
