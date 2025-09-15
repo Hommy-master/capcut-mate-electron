@@ -1,33 +1,343 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>剪映小助手</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-            background-color: #f0f0f0;
-        }
-        h1 {
-            color: #333;
-        }
-        .platform {
-            margin-top: 20px;
-            font-weight: bold;
-            color: #555;
-        }
-    </style>
-</head>
-<body>
-    <h1>Hello Electron!</h1>
-    <p>这是一个简单的Electron应用程序</p>
-    <div class="platform">运行在: <span id="platform"></span></div>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="./assets/styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script type="text/javascript" src="./assets/FileSaver.min.js"></script>
+  </head>
+  <script>
+    const jsonData = {
+      code: 0,
+      message: "成功",
+      files: [
+        "https://cm.jcaigc.cn/output/draft/2025090716400922f559b4/draft_meta_info.json",
+        "https://cm.jcaigc.cn/output/draft/2025090716400922f559b4/draft_content.json",
+        "https://cm.jcaigc.cn/output/draft/2025090716400922f559b4/assets/videos/14d90befb345bde73f1105df89d9c23b.mp4",
+      ],
+    };
+    const targetId = "2025090716400922f559b4";
+    // 保存文件
+    async function saveFile() {
+      const matchedFiles = jsonData.files.filter((fileUrl) =>
+        fileUrl.includes(targetId)
+      );
+
+      if (matchedFiles.length === 0) {
+        alert("未找到");
+        downloadBtn.disabled = false;
+        return;
+      }
+
+      try {
+        const result = await window.electronAPI.saveFile(matchedFiles);
+        alert(result.message);
+      } catch (error) {
+        alert("保存文件时出错: " + error.message);
+      }
+    }
+  </script>
+
+  <body>
+    <div class="container">
+      <!-- 模块一：走马灯 -->
+      <section class="module">
+        <div class="carousel">
+          <div class="carousel-inner">
+            <div
+              class="carousel-item"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb');
+              "
+            >
+              <div class="carousel-caption">
+                <h3>美丽山脉</h3>
+                <p>自然风光的壮丽与宁静</p>
+              </div>
+            </div>
+            <div
+              class="carousel-item"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1518837695005-2083093ee35b');
+              "
+            >
+              <div class="carousel-caption">
+                <h3>宁静海滩</h3>
+                <p>夏日海滩的悠闲时光</p>
+              </div>
+            </div>
+            <div
+              class="carousel-item"
+              style="
+                background-image: url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e');
+              "
+            >
+              <div class="carousel-caption">
+                <h3>神秘森林</h3>
+                <p>探索未知的自然奥秘</p>
+              </div>
+            </div>
+          </div>
+          <button class="carousel-control carousel-prev">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="carousel-control carousel-next">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <div class="carousel-indicators">
+            <div class="carousel-indicator active"></div>
+            <div class="carousel-indicator"></div>
+            <div class="carousel-indicator"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 模块二：可变高度输入框 -->
+      <section class="module">
+        <div class="textarea-container">
+          <textarea
+            class="auto-resize-textarea"
+            placeholder="请输入内容..."
+          ></textarea>
+        </div>
+      </section>
+
+      <!-- 模块三：案例Tab -->
+      <section class="module tabs-module">
+        <span><i class="fas fa-folder-open"></i> 案例草稿：</span>
+        <div class="tabs" id="tabContainer"></div>
+      </section>
+
+      <!-- 模块四：下载开关 -->
+      <section class="module">
+        <div class="switch-container">
+          <label class="switch">
+            <input type="checkbox" id="downloadToggle" checked />
+            <span class="slider"></span>
+          </label>
+          <span id="switchStatus">下载功能已启用</span>
+        </div>
+      </section>
+
+      <!-- 模块五：下载按钮 -->
+      <section class="module">
+        <button id="downloadBtn" class="btn btn-download">
+          <i class="fas fa-download"></i> 创建剪映草稿
+        </button>
+      </section>
+
+      <!-- 模块六：下载日志 -->
+      <section class="module log-module">
+        <h2 class="module-title">
+          <span><i class="fas fa-list-alt"></i> 下载日志</span>
+          <button id="clearLogBtn" class="btn btn-clear">
+            <i class="fas fa-trash"></i> 清空日志
+          </button>
+        </h2>
+        <div class="log-empty" id="emptyLog">暂无日志记录</div>
+        <ul class="log-list hide" id="downloadLog"></ul>
+      </section>
+    </div>
 
     <script>
-        // 显示当前平台信息
-        document.getElementById('platform').textContent = process.platform;
+      document.addEventListener("DOMContentLoaded", function () {
+        // 走马灯功能
+        const carouselInner = document.querySelector(".carousel-inner");
+        const carouselItems = document.querySelectorAll(".carousel-item");
+        const carouselIndicators = document.querySelectorAll(
+          ".carousel-indicator"
+        );
+        const prevBtn = document.querySelector(".carousel-prev");
+        const nextBtn = document.querySelector(".carousel-next");
+        let currentIndex = 0;
+        const totalItems = carouselItems.length;
+
+        // 更新走马灯状态
+        function updateCarousel() {
+          carouselInner.style.transform = `translateX(-${currentIndex * 100}%)`;
+          carouselIndicators.forEach((indicator, index) => {
+            indicator.classList.toggle("active", index === currentIndex);
+          });
+        }
+
+        // 下一张
+        function nextSlide() {
+          currentIndex = (currentIndex + 1) % totalItems;
+          updateCarousel();
+        }
+
+        // 上一张
+        function prevSlide() {
+          currentIndex = (currentIndex - 1 + totalItems) % totalItems;
+          updateCarousel();
+        }
+
+        // 绑定事件
+        nextBtn.addEventListener("click", nextSlide);
+        prevBtn.addEventListener("click", prevSlide);
+
+        // 指示器点击
+        carouselIndicators.forEach((indicator, index) => {
+          indicator.addEventListener("click", () => {
+            currentIndex = index;
+            updateCarousel();
+          });
+        });
+
+        // 自动播放
+        let carouselInterval = setInterval(nextSlide, 5000);
+
+        // 鼠标悬停时暂停自动播放
+        const carousel = document.querySelector(".carousel");
+        carousel.addEventListener("mouseenter", () => {
+          clearInterval(carouselInterval);
+        });
+
+        carousel.addEventListener("mouseleave", () => {
+          carouselInterval = setInterval(nextSlide, 5000);
+        });
+
+        // 可变高度文本区域
+        const textarea = document.querySelector(".auto-resize-textarea");
+
+        // 动态生成案例Tab
+        const tabContainer = document.getElementById("tabContainer");
+        const templates = {
+          template1: {
+            title: "案例一",
+            content:
+              "https://github.com/Hommy-master/docs/archive/refs/heads/main.zip",
+          },
+          template2: {
+            title: "案例二",
+            content:
+              "https://github.com/Hommy-master/docs/archive/refs/heads/main1.zip",
+          },
+          template3: {
+            title: "案例三",
+            content:
+              "https://github.com/Hommy-master/docs/archive/refs/heads/main2.zip",
+          },
+        };
+
+        // 动态生成Tab按钮
+        Object.keys(templates).forEach((key, index) => {
+          const template = templates[key];
+          const button = document.createElement("button");
+          button.className = "tab-btn";
+          button.textContent = template.title;
+          button.setAttribute("data-template", key);
+
+          // 第一个按钮设置为active
+          if (index === 0) {
+            button.classList.add("active");
+            // 设置第一个模板为默认内容
+            textarea.value = template.content;
+            textarea.dispatchEvent(new Event("input"));
+          }
+
+          tabContainer.appendChild(button);
+        });
+
+        // 案例模板功能
+        const tabButtons = document.querySelectorAll(".tab-btn");
+
+        tabButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            // 移除所有active类
+            tabButtons.forEach((btn) => btn.classList.remove("active"));
+            // 添加active类到当前按钮
+            this.classList.add("active");
+
+            // 获取对应的模板内容
+            const templateId = this.getAttribute("data-template");
+            const content = templates[templateId].content;
+
+            // 更新文本区域内容
+            textarea.value = content;
+            textarea.dispatchEvent(new Event("input"));
+
+            // 添加日志
+            addLog(`已切换到模板：${this.textContent}`);
+          });
+        });
+
+        // 下载开关功能
+        const downloadToggle = document.getElementById("downloadToggle");
+        const switchStatus = document.getElementById("switchStatus");
+        const downloadBtn = document.getElementById("downloadBtn");
+
+        downloadToggle.addEventListener("change", function () {
+          if (this.checked) {
+            switchStatus.textContent = "下载功能已启用";
+            downloadBtn.disabled = false;
+          } else {
+            switchStatus.textContent = "下载功能已禁用";
+            downloadBtn.disabled = true;
+          }
+        });
+
+        function downloadFile(fileUrl, fileName = "downloaded_file") {
+          const link = document.createElement("a");
+          link.target = "_blank";
+          link.href = fileUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+
+        // 下载按钮功能
+        downloadBtn.addEventListener("click", function () {
+          if (textarea.value.trim() === "") {
+            alert("内容为空，无法下载");
+            return;
+          }
+
+          saveFile();
+        });
+
+        // 清空日志功能
+        const clearLogBtn = document.getElementById("clearLogBtn");
+        const logList = document.getElementById("downloadLog");
+        const emptyLog = document.getElementById("emptyLog");
+
+        clearLogBtn.addEventListener("click", function () {
+          logList.innerHTML = "";
+          logList.classList.add("hide");
+          emptyLog.classList.remove("hide");
+        });
+
+        // 添加日志函数
+        function addLog(message) {
+          emptyLog.classList.add("hide");
+          logList.classList.remove("hide");
+          const now = new Date();
+          const timeString = now.toLocaleTimeString();
+
+          const logItem = document.createElement("li");
+          logItem.className = "log-item";
+          logItem.innerHTML = `
+                                        <i class="fas fa-info-circle log-icon"></i>
+                                        <span>${message}</span>
+                                        <span class="log-time">${timeString}</span>
+                                    `;
+
+          // 将新日志添加到顶部
+          logList.insertBefore(logItem, logList.firstChild);
+
+          // 限制日志数量最多为10条
+          if (logList.children.length > 10) {
+            logList.removeChild(logList.lastChild);
+          }
+        }
+      });
     </script>
-</body>
+  </body>
 </html>

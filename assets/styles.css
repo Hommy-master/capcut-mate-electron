@@ -1,0 +1,365 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+.hide {
+    display: none;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+i.fas {
+    color: #3498db;
+}
+
+.btn i.fas {
+    color: white;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.module {
+    border-radius: 10px;
+    margin-bottom: 24px;
+}
+
+.module-title {
+    font-size: 1.25rem;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 走马灯样式 */
+.carousel {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.carousel-inner {
+    display: flex;
+    transition: transform 0.5s ease;
+    height: 100%;
+}
+
+.carousel-item {
+    min-width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 15px;
+    border-radius: 8px;
+    width: 100%;
+}
+
+.carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    color: #2c3e50;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.carousel-control:hover {
+    background: white;
+}
+
+.carousel-prev {
+    left: 15px;
+}
+
+.carousel-next {
+    right: 15px;
+}
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+.carousel-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+}
+
+.carousel-indicator.active {
+    background: white;
+}
+
+/* 文本输入区域样式 */
+.textarea-container {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.auto-resize-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: none;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: border-color 0.3s;
+    display: block;
+}
+
+.auto-resize-textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* Tab样式 */
+.tabs-module {
+    display: flex;
+    align-items: center;
+}
+.tabs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 8px 20px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 32px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.tab-btn:hover {
+    background: #e9ecef;
+}
+
+.tab-btn.active {
+    background: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
+/* 开关样式 */
+.switch-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: #2196f3;
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
+}
+
+/* 按钮样式 */
+.btn {
+    padding: 14px 28px;
+    background: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn:hover {
+    background: #27ae60;
+    transform: translateY(-2px);
+}
+
+.btn:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-download{
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-clear {
+    background: #3498db;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+}
+
+.btn-clear:hover {
+    background: #5aa1f3;
+}
+
+.log-module {    
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    overflow: hidden;
+}
+.log-module .module-title {    
+    padding: 12px;
+}
+.log-module .module-title {
+    background-color: #f8f8f8;
+    border-bottom: solid 1px #ddd;
+}
+
+.log-empty {
+    padding: 20px;
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 1rem;
+}
+
+/* 日志列表样式 */
+.log-list {
+    list-style: none;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.log-item {
+    padding: 8px 12px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.log-item:last-child {
+    border-bottom: none;
+}
+
+.log-icon {
+    color: #3498db;
+}
+
+.log-time {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-left: auto;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .carousel {
+        height: 250px;
+    }
+
+    .tabs {
+        flex-direction: column;
+    }
+
+    .tab-btn {
+        width: 100%;
+    }
+
+    .module-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
