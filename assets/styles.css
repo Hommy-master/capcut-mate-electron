@@ -55,7 +55,7 @@ h1 {
 }
 
 .module-title {
-    font-size: 1.25rem;
+    font-size: 1rem;
     color: #2c3e50;
     display: flex;
     align-items: center;
@@ -285,8 +285,8 @@ input:checked+.slider:before {
 
 .btn-clear {
     background: #3498db;
-    padding: 8px 16px;
-    font-size: 0.9rem;
+    padding: 4px 8px;
+    font-size: 0.75rem;
 }
 
 .btn-clear:hover {
@@ -300,7 +300,7 @@ input:checked+.slider:before {
     overflow: hidden;
 }
 .log-module .module-title {    
-    padding: 12px;
+    padding: 8px 12px;
 }
 .log-module .module-title {
     background-color: #f8f8f8;
@@ -320,7 +320,6 @@ input:checked+.slider:before {
     max-height: 300px;
     overflow-y: auto;
 }
-
 .log-item {
     padding: 8px 12px;
     border-bottom: 1px solid #eee;
@@ -329,19 +328,40 @@ input:checked+.slider:before {
     gap: 10px;
 }
 
+.log-time {
+    color: #7f8c8d;
+    font-size: 0.75rem;
+}
+
+.log-item .log-icon:not(.show) {
+    display: none;
+}
+
+.log-item .log-icon.loading,
+.log-item .log-icon.all {
+    display: inline-block;
+}
+
+
+.log-item.loading,
+i.log-icon {
+    color: #3498db;
+}
+.log-item.all, .log-item.success,
+i.log-icon.all,
+i.log-icon.success {
+    color: #0da73b;
+}
+
+.log-item.error,
+i.log-icon.error {
+    color: #e74c3c;
+}
+
 .log-item:last-child {
     border-bottom: none;
 }
 
-.log-icon {
-    color: #3498db;
-}
-
-.log-time {
-    color: #7f8c8d;
-    font-size: 0.9rem;
-    margin-left: auto;
-}
 
 /* 响应式设计 */
 @media (max-width: 768px) {

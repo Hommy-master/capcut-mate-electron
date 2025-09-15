@@ -22,26 +22,6 @@
         "https://cm.jcaigc.cn/output/draft/2025090716400922f559b4/assets/videos/14d90befb345bde73f1105df89d9c23b.mp4",
       ],
     };
-    const targetId = "2025090716400922f559b4";
-    // 保存文件
-    async function saveFile() {
-      const matchedFiles = jsonData.files.filter((fileUrl) =>
-        fileUrl.includes(targetId)
-      );
-
-      if (matchedFiles.length === 0) {
-        alert("未找到");
-        downloadBtn.disabled = false;
-        return;
-      }
-
-      try {
-        const result = await window.electronAPI.saveFile(matchedFiles);
-        alert(result.message);
-      } catch (error) {
-        alert("保存文件时出错: " + error.message);
-      }
-    }
   </script>
 
   <body>
@@ -121,7 +101,7 @@
             <input type="checkbox" id="downloadToggle" checked />
             <span class="slider"></span>
           </label>
-          <span id="switchStatus">下载功能已启用</span>
+          <span>下载后打开草稿路径文件</span>
         </div>
       </section>
 
@@ -212,17 +192,17 @@
           template1: {
             title: "案例一",
             content:
-              "https://github.com/Hommy-master/docs/archive/refs/heads/main.zip",
+              "https://cm.jcaigc.cn/openapi/v1/get_draft?draft_id=2025090716400922f559b4",
           },
           template2: {
             title: "案例二",
             content:
-              "https://github.com/Hommy-master/docs/archive/refs/heads/main1.zip",
+              "https://cm.jcaigc.cn/openapi/v1/get_draft?draft_id=202509151914009cdf8766",
           },
           template3: {
             title: "案例三",
             content:
-              "https://github.com/Hommy-master/docs/archive/refs/heads/main2.zip",
+              "https://cm.jcaigc.cn/openapi/v1/get_draft?draft_id=2025091519145792de542a",
           },
         };
 
@@ -270,37 +250,72 @@
 
         // 下载开关功能
         const downloadToggle = document.getElementById("downloadToggle");
-        const switchStatus = document.getElementById("switchStatus");
         const downloadBtn = document.getElementById("downloadBtn");
 
-        downloadToggle.addEventListener("change", function () {
-          if (this.checked) {
-            switchStatus.textContent = "下载功能已启用";
-            downloadBtn.disabled = false;
-          } else {
-            switchStatus.textContent = "下载功能已禁用";
-            downloadBtn.disabled = true;
-          }
-        });
+        function getQueryParam(paramName, url) {
+          // 构造正则表达式：匹配 ? 或 & 后面跟随的参数名称和其值
+          const regex = new RegExp("[?&]" + paramName + "=([^&#]*)", "i");
+          const result = regex.exec(url);
+          // 如果找到匹配项，则解码后返回；否则返回 null
+          return result ? decodeURIComponent(result[1]) : null;
+        }
 
-        function downloadFile(fileUrl, fileName = "downloaded_file") {
-          const link = document.createElement("a");
-          link.target = "_blank";
-          link.href = fileUrl;
-          link.download = fileName;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+        // 保存文件
+        async function saveFile(value) {
+          const targetId = getQueryParam("draft_id", value);
+
+          if (!targetId) {
+            alert(`${value} 中缺少 draft_id 参数`);
+            return;
+          }
+
+          const jsonData = await window.electronAPI.getUrlJsonData(value);
+
+          if (jsonData?.code !== 0 || !jsonData?.files) {
+            alert("获取文件列表失败");
+            return;
+          }
+
+          const matchedFiles = jsonData.files.filter((fileUrl) =>
+            fileUrl.includes(targetId)
+          );
+
+          if (matchedFiles.length === 0) {
+            alert("未找到");
+            return;
+          }
+          downloadBtn.disabled = true;
+          downloadToggle.disabled = true;
+          const isOpenDir = downloadToggle.checked;
+          try {
+            const result = await window.electronAPI.saveFile({
+              remoteFileUrls: matchedFiles,
+              targetId,
+              isOpenDir,
+            });
+            // alert(result.message);
+          } catch (error) {
+            alert("保存文件时出错: " + error.message);
+          }
+          downloadBtn.disabled = false;
+
+          downloadToggle.disabled = false;
         }
 
         // 下载按钮功能
-        downloadBtn.addEventListener("click", function () {
-          if (textarea.value.trim() === "") {
+        downloadBtn.addEventListener("click", async function () {
+          const value = textarea.value.trim();
+          if (value === "") {
             alert("内容为空，无法下载");
             return;
           }
 
-          saveFile();
+          const valArray = value.split("\n").map((line) => line.trim());
+          for (const val of valArray) {
+            if (val) {
+              await saveFile(val);
+            }
+          }
         });
 
         // 清空日志功能
@@ -315,28 +330,58 @@
         });
 
         // 添加日志函数
-        function addLog(message) {
+        function addLog(message, level = "info") {
           emptyLog.classList.add("hide");
           logList.classList.remove("hide");
           const now = new Date();
-          const timeString = now.toLocaleTimeString();
+          const timeString = now.toLocaleDateString();
+
+          const logIconMap = {
+            info: "fas fa-info-circle",
+            success: "fas fa-check-circle",
+            error: "fas fa-times-circle",
+            loading: "fas fa-spinner fa-spin",
+            all: "fas fa-check-circle", // check-square
+          };
 
           const logItem = document.createElement("li");
-          logItem.className = "log-item";
+          logItem.className = `log-item ${level}`;
           logItem.innerHTML = `
-                                        <i class="fas fa-info-circle log-icon"></i>
+                                        <span class="log-time">[${timeString}] </span>
+                                        <i class="${logIconMap[level]} ${level} show log-icon"></i>
                                         <span>${message}</span>
-                                        <span class="log-time">${timeString}</span>
                                     `;
 
+          const existingItems = logList.querySelectorAll(".log-item");
+
+          existingItems.forEach((item) => {
+            const iconItem = item.querySelector(".log-icon");
+
+            const oldLevel = Array.from(iconItem.classList).find((cls) =>
+              ["loading", "show"].includes(cls)
+            );
+
+            iconItem.classList.remove(oldLevel);
+          });
+
           // 将新日志添加到顶部
-          logList.insertBefore(logItem, logList.firstChild);
+          logList.appendChild(logItem);
 
           // 限制日志数量最多为10条
-          if (logList.children.length > 10) {
-            logList.removeChild(logList.lastChild);
-          }
+          // if (logList.children.length > 50) {
+          //   logList.removeChild(logList.firstChild);
+          // }
         }
+
+        // 监听来自主进程的日志消息
+        window.electronAPI.onFileOperationLog((logEntry) => {
+          addLog(logEntry.message, logEntry.level);
+        });
+
+        // 可选：在页面卸载或关闭时移除监听器，防止内存泄漏
+        window.addEventListener("beforeunload", () => {
+          window.electronAPI.removeAllFileOperationLogListeners();
+        });
       });
     </script>
   </body>

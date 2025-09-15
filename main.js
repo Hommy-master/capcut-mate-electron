@@ -1,14 +1,16 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs').promises; // 使用 fs.promises 进行异步文件操作
 const { createWriteStream } = require('fs');
 const axios = require('axios');
 
+let mainWindow;
+
 function createWindow() {
   // 创建浏览器窗口
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+  mainWindow = new BrowserWindow({
+    width: 1200,
+    height: 700,
     webPreferences: {
       nodeIntegration: false, // 禁用 Node.js 集成（出于安全考虑，强烈推荐）:cite[5]:cite[7]
       contextIsolation: true, // 启用上下文隔离（Electron 12 后默认 true，推荐开启）:cite[3]:cite[7]
@@ -29,25 +31,126 @@ function createWindow() {
 // 当Electron完成初始化并准备创建浏览器窗口时调用此方法
 app.whenReady().then(createWindow);
 
+function getConfigPath() {
+  return path.join(app.getPath('userData'), 'config.json');
+}
 
-ipcMain.handle('save-file', async (event, remoteFileUrls) => {
+async function readConfig() {
+  const configPath = getConfigPath();
+  console.log('[log] Config path:', configPath);
   try {
-    // 1. 弹出对话框让用户选择要保存到的目标目录
-    const result = await dialog.showOpenDialog({
-      properties: ['openDirectory'], // 选择目录:cite[6]
-      title: '请选择要保存文件的主目录'
+    const data = await fs.readFile(configPath, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    return {};
+  }
+}
+
+async function writeConfig(config) {
+  const configPath = getConfigPath();
+  try {
+    await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
+    return true;
+  } catch (error) {
+    console.error('写入配置文件失败:', error);
+    return false;
+  }
+}
+
+// 提取出来的函数，可选参数parentWindow用于显示对话框时附加到对话框
+async function getTargetDirectory(parentWindow = null) {
+  let config = await readConfig();
+  if (config.targetDirectory) {
+    try {
+      await fs.access(config.targetDirectory);
+      return config.targetDirectory;
+    } catch (accessErr) {
+      console.warn('配置的目录已不存在，将重新选择。');
+    }
+  }
+
+  const dialogOptions = {
+    properties: ['openDirectory'],
+    title: '请选择目标目录',
+    buttonLabel: '选择此目录'
+  };
+
+  // 如果有父窗口，则附加到父窗口
+  if (parentWindow) {
+    dialogOptions.window = parentWindow;
+  }
+
+  const result = await dialog.showOpenDialog(dialogOptions);
+
+  if (!result.canceled && result.filePaths.length > 0) {
+    const selectedDir = result.filePaths[0];
+    config.targetDirectory = selectedDir;
+    await writeConfig(config);
+    return selectedDir;
+  } else {
+    throw new Error('用户取消了目录选择');
+  }
+}
+
+// 注册IPC处理器，这里我们假设渲染进程会发送'get-target-dir'消息，并且我们希望对话框附加到发送消息的渲染进程窗口
+ipcMain.handle('get-target-dir', async (event) => {
+  // 从事件对象中获取发送消息的窗口
+  const window = BrowserWindow.fromWebContents(event.sender);
+  return getTargetDirectory(window);
+});
+
+ipcMain.handle('get-url-json-data', async (event, remoteUrl) => {
+  try {
+    const response = await axios({
+      method: 'GET',
+      url: remoteUrl,
+      responseType: 'json',
+      timeout: 30000, // 30秒超时
+      headers: { // 添加常见的浏览器User-Agent
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
     });
 
-    if (result.canceled) {
-      return { success: false, message: '用户取消了操作' };
+    // 检查HTTP状态码
+    if (response.status !== 200) {
+      mainWindow.webContents.send('file-operation-log', { level: 'error', message: `读取 ${remoteUrl} 数据失败` });
+      throw new Error(`[error] request failed, status code: ${response.status}`);
     }
 
-    let baseTargetDir = result.filePaths[0]; // 用户选择的目标目录
+    return response.data;
+  } catch (error) {
+    // 更精确的错误处理
+    if (error.code === 'ECONNREFUSED') {
+      throw new Error(`[error] not connect to server: ${url}`);
+    } else if (error.code === 'ENOTFOUND') {
+      throw new Error(`[error] domain not found: ${url}`);
+    } else if (error.response) {
+      // 服务器返回了错误状态码（如4xx, 5xx）
+      throw new Error(`[error] server error (${error.response.status}): ${url}`);
+    } else {
+      throw error; // 重新抛出其他未知错误
+    }
+  }
+});
 
-    // 移除可能存在的域名部分或特定前缀（根据你的URL结构调整）
-    // 例如，如果URL路径都以 '/2025090716400922f559b4/' 开头，你可以把它去掉
-    const targetId = '/2025090716400922f559b4/';
 
+ipcMain.handle('save-file', async (event, { remoteFileUrls, targetId, isOpenDir }) => {
+  try {
+    let baseTargetDir = '';
+    // 然后获取目标目录，将主窗口作为父窗口传递
+    try {
+      baseTargetDir = await getTargetDirectory(mainWindow);
+      console.log('[log] get target dir:', baseTargetDir);
+    } catch (error) {
+      console.error('[log] get target dir fail:', error);
+      mainWindow.webContents.send('file-operation-log', { level: 'error', message: `获取目录失败：${error}` });
+      return;
+    }
+
+    mainWindow.webContents.send('file-operation-log', { level: 'info', message: `创建剪映草稿目录：${targetId}` });
+
+    let i = 0;
+    let relativePath = '';
     // 2. 遍历远程文件URL数组
     for (const fileUrl of remoteFileUrls) {
       try {
@@ -61,8 +164,14 @@ ipcMain.handle('save-file', async (event, remoteFileUrls) => {
         const idIndex = fullPath.indexOf(targetId);
         if (idIndex === -1) continue;
 
-        // 提取ID之后的部分作为将要下载的路径
-        const relativePath = fullPath.substring(idIndex);
+
+        console.log('[log] idIndex: ' + idIndex);
+
+        // 提取ID及之后的部分作为将要下载的路径
+        relativePath = fullPath.substring(idIndex).replaceAll('/', path.sep); // 替换为系统路径分隔符
+
+
+        console.log('[log] relativePath: ' + relativePath);
 
         const fullTargetPath = path.join(baseTargetDir, relativePath);
         const targetDir = path.dirname(fullTargetPath);
@@ -76,88 +185,29 @@ ipcMain.handle('save-file', async (event, remoteFileUrls) => {
         // return { success: true, message: targetDir };
 
         // 4. 下载文件
-        // await startDownload({}, { url: fileUrl, fileName: 'draft_meta_info.json', targetDirectory: targetDir });
-        await downloadFile(fileUrl, fullTargetPath);
+        await downloadFile(fileUrl, fullTargetPath, relativePath, targetDir);
         console.log(`[log] file saved to : ${fullTargetPath}`);
+
+        mainWindow.webContents.send('file-operation-log', { level: 'success', message: `第 ${++i} 个草稿信息文件保存成功` });
       } catch (error) {
         console.error(`[error] download file ${fileUrl} failed:`, error);
+
+        mainWindow.webContents.send('file-operation-log', { level: 'error', message: `第 ${++i} 个草稿信息文件保存失败` });
         // 你可以决定是继续下载其他文件还是直接抛出错误
         // 这里记录错误但继续尝试下载下一个文件
       }
     }
-
-    return { success: true, message: `文件批量保存完成，保存至目录: ${path.join(baseTargetDir, targetId)}` };
+    mainWindow.webContents.send('file-operation-log', { level: 'all', message: `下载完成：所有 ${targetId} 中的剪映草稿已成功下载！` });
+    const jointPath = path.join(baseTargetDir, targetId);
+    console.log(`[finish] all download: ${jointPath}`);
+    if (isOpenDir) await openDirectory(null, jointPath);
+    return { success: true, message: `文件批量保存完成，保存至目录: ${jointPath}` };
   } catch (error) {
     console.error(`[error] 批量保存过程发生错误:`, error);
+
+    mainWindow.webContents.send('file-operation-log', { level: 'error', message: `下载完成：批量保存 ${targetId} 中的剪映草稿过程发生错误！` });
     return { success: false, message: `保存失败: ${error.message} ` };
   }
-});
-
-/**
- * 增强版下载函数：下载文件并保存到指定路径，包含详细错误处理
- * @param {string} url 远程文件的URL
- * @param {string} filePath 要保存到的本地文件路径
- */
-
-ipcMain.handle('download-file', async (event, fileUrl, filePath) => {
-  return new Promise(async (resolve, reject) => {
-    // 创建可写流
-    const fileStream = createWriteStream(filePath);
-    fileStream.on('error', (err) => {
-      console.error(`[ERROR] 写入文件流错误 ${filePath}:`, err.message);
-      reject(err);
-    });
-    fileStream.on('finish', () => {
-      console.log(`[SUCCESS] 文件下载完成: ${filePath}`);
-      resolve();
-    });
-
-    // 设置响应类型为 'stream' 以处理大文件
-    try {
-      const response = await axios({
-        method: 'GET',
-        url: url,
-        responseType: 'stream',
-        timeout: 30000, // 30秒超时
-        headers: { // 添加常见的浏览器User-Agent
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-      });
-
-      // 检查HTTP状态码
-      if (response.status !== 200) {
-        throw new Error(`请求失败，状态码: ${response.status}`);
-      }
-
-      // 创建可写流
-      const writer = response.data.pipe(fileStream);
-
-      return new Promise((resolve, reject) => {
-        writer.on('finish', resolve);
-        writer.on('error', (err) => {
-          // 尝试删除可能不完整的文件
-          fs.unlink(filePath).catch(() => { });
-          reject(new Error(`写入文件失败: ${err.message}`));
-        });
-        response.data.on('error', (err) => {
-          reject(new Error(`下载流错误: ${err.message}`));
-        });
-      });
-
-    } catch (error) {
-      // 更精确的错误处理
-      if (error.code === 'ECONNREFUSED') {
-        throw new Error(`无法连接到服务器: ${url}`);
-      } else if (error.code === 'ENOTFOUND') {
-        throw new Error(`域名无法解析: ${url}`);
-      } else if (error.response) {
-        // 服务器返回了错误状态码（如4xx, 5xx）
-        throw new Error(`服务器错误 (${error.response.status}): ${url}`);
-      } else {
-        throw error; // 重新抛出其他未知错误
-      }
-    }
-  });
 });
 
 /**
@@ -165,9 +215,10 @@ ipcMain.handle('download-file', async (event, fileUrl, filePath) => {
  * @param {string} url 远程文件的URL
  * @param {string} filePath 要保存到的本地文件路径
  */
-async function downloadFile(url, filePath) {
+async function downloadFile(url, filePath, relativePath, targetDir) {
 
   console.log(`[log] start get file context : ${filePath}`);
+  mainWindow.webContents.send('file-operation-log', { level: 'loading', message: `正在下载草稿内容文件: ${relativePath}` });
   // 设置响应类型为 'stream' 以处理大文件
   try {
     const response = await axios({
@@ -182,10 +233,14 @@ async function downloadFile(url, filePath) {
 
     // 检查HTTP状态码
     if (response.status !== 200) {
+      mainWindow.webContents.send('file-operation-log', { level: 'error', message: `下载草稿内容文件失败` });
       throw new Error(`[error] request failed, status code: ${response.status}`);
     }
 
     console.log(`[log] start create writable stream: ${filePath}`);
+
+
+    mainWindow.webContents.send('file-operation-log', { level: 'loading', message: `正在将草稿内容文件写入本地草稿目录 ${targetDir}` });
 
     // 创建可写流
     const writer = response.data.pipe(createWriteStream(filePath));
@@ -214,6 +269,32 @@ async function downloadFile(url, filePath) {
     } else {
       throw error; // 重新抛出其他未知错误
     }
+  }
+}
+
+// 打开目录
+async function openDirectory(event, dirPath) {
+  try {
+    const errorMsg = await shell.openPath(dirPath);
+    if (errorMsg) {
+      console.error(`[error] Failed to open path: ${errorMsg}`);
+      return { success: false, error: errorMsg };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error(`[error] Error opening path: ${error}`);
+    return { success: false, error: error.message };
+  }
+}
+
+// 从URL提取文件名
+function getFileNameFromUrl(url) {
+  try {
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname;
+    return pathname.substring(pathname.lastIndexOf('/') + 1) || 'download';
+  } catch (e) {
+    return 'download';
   }
 }
 
