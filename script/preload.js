@@ -9,9 +9,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     getUrlJsonData: (url) => ipcRenderer.invoke('get-url-json-data', url),
 
-    getLogData: () => ipcRenderer.invoke('get-log-data'),
+    getDownloadLog: () => ipcRenderer.invoke('get-download-log'),
 
-    clearLogData: () => ipcRenderer.invoke('clear-log-data'),
+    clearDownloadLog: () => ipcRenderer.invoke('clear-download-log'),
 
     // 监听来自主进程的日志消息
     onFileOperationLog: (callback) => {

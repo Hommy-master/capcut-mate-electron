@@ -4,6 +4,8 @@ const fs = require('fs').promises; // 使用 fs.promises 进行异步文件操�
 const { createWriteStream } = require('fs');
 const axios = require('axios');
 
+const logger = require('./script/logger');
+
 let mainWindow;
 
 function createWindow() {
@@ -12,14 +14,14 @@ function createWindow() {
     width: 1200,
     height: 768,
     webPreferences: {
-      nodeIntegration: false, // 禁用 Node.js 集成（出于安全考虑，强烈推荐）:cite[5]:cite[7]
-      contextIsolation: true, // 启用上下文隔离（Electron 12 后默认 true，推荐开启）:cite[3]:cite[7]
-      preload: path.join(__dirname, 'preload.js') // 指定预加载脚本的绝对路径
+      nodeIntegration: false, // 禁用 Node.js 集成（出于安全考虑，强烈推荐）
+      contextIsolation: true, // 启用上下文隔离（Electron 12 后默认 true，推荐开启）
+      preload: path.join(__dirname, './script/preload.js') // 指定预加载脚本的绝对路径
     }
   });
 
   // 加载应用的index.html
-  mainWindow.loadFile('index.html');
+  mainWindow.loadFile('./web/index.html');
 
   // 开发环境下打开DevTools
   if (!app.isPackaged) {
@@ -32,16 +34,16 @@ function createWindow() {
 app.whenReady().then(createWindow);
 
 function getConfigPath() {
-  return path.join(app.getPath('userData'), 'config.json');
+  return path.join(__dirname, 'app-config.json');
 }
 
-function getLogPath() {
-  return path.join(app.getPath('userData'), 'log.json');
+function getDownloadLogPath() {
+  return path.join(__dirname, 'download-log.json');
 }
 
 async function readConfig() {
   const configPath = getConfigPath();
-  console.log('[log] Config path:', configPath);
+  logger.info('[log] Config path:', configPath);
   try {
     const data = await fs.readFile(configPath, 'utf8');
     return JSON.parse(data);
@@ -50,9 +52,9 @@ async function readConfig() {
   }
 }
 
-async function readLog() {
-  const logPath = getLogPath();
-  console.log('[log] Log path:', logPath);
+async function readDownloadLog() {
+  const logPath = getDownloadLogPath();
+  logger.info('[log] Log path:', logPath);
   try {
     const data = await fs.readFile(logPath, 'utf8');
     return JSON.parse(data);
@@ -61,13 +63,13 @@ async function readLog() {
   }
 }
 
-async function clearLog() {
-  const logPath = getLogPath();
+async function clearDownloadLog() {
+  const logPath = getDownloadLogPath();
   try {
     await fs.writeFile(logPath, JSON.stringify([], null, 2), 'utf8');
     return true;
   } catch (error) {
-    console.error('清空日志文件失败:', error);
+    logger.error('清空日志文件失败:', error);
     return false;
   }
 }
@@ -76,11 +78,11 @@ async function clearLog() {
  * 
  * @param {*} entry { level: 'error', message: '日志内容' }
  */
-async function appendLog(entry) {
-  const logPath = getLogPath();
+async function appendDownloadLog(entry) {
+  const logPath = getDownloadLogPath();
   let logs = [];
   try {
-    logs = await readLog();
+    logs = await readDownloadLog();
   } catch (error) {
     // 如果文件不存在或无法读取，初始化为空数组
     logs = [];
@@ -93,7 +95,7 @@ async function appendLog(entry) {
   try {
     await fs.writeFile(logPath, JSON.stringify(logs, null, 2), 'utf8');
   } catch (writeErr) {
-    console.error('写入日志文件失败:', writeErr);
+    logger.error('写入日志文件失败:', writeErr);
   }
 }
 
@@ -103,7 +105,7 @@ async function writeConfig(config) {
     await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
     return true;
   } catch (error) {
-    console.error('写入配置文件失败:', error);
+    logger.error('写入配置文件失败:', error);
     return false;
   }
 }
@@ -116,7 +118,7 @@ async function getTargetDirectory(parentWindow = null) {
       await fs.access(config.targetDirectory);
       return config.targetDirectory;
     } catch (accessErr) {
-      console.warn('配置的目录已不存在，将重新选择。');
+      logger.warn('配置的目录已不存在，将重新选择。');
     }
   }
 
@@ -143,12 +145,12 @@ async function getTargetDirectory(parentWindow = null) {
   }
 }
 
-ipcMain.handle('get-log-data', async (event) => {
-  return await readLog();
+ipcMain.handle('get-download-log', async (event) => {
+  return await readDownloadLog();
 });
 
-ipcMain.handle('clear-log-data', async (event) => {
-  return await clearLog();
+ipcMain.handle('clear-download-log', async (event) => {
+  return await clearDownloadLog();
 });
 
 ipcMain.handle('get-url-json-data', async (event, remoteUrl) => {
@@ -191,14 +193,14 @@ ipcMain.handle('save-file', async (event, { remoteFileUrls, targetId, isOpenDir 
     // 然后获取目标目录，将主窗口作为父窗口传递
     try {
       baseTargetDir = await getTargetDirectory(mainWindow);
-      console.log('[log] get target dir:', baseTargetDir);
+      logger.info('[log] get target dir:', baseTargetDir);
     } catch (error) {
-      console.error('[log] get target dir fail:', error);
-      await appendLog({ level: 'error', message: `获取目录失败：${error}` });
+      logger.error('[log] get target dir fail:', error);
+      await appendDownloadLog({ level: 'error', message: `获取目录失败：${error}` });
       return;
     }
 
-    await appendLog({ level: 'info', message: `创建剪映草稿目录：${targetId}` });
+    await appendDownloadLog({ level: 'info', message: `创建剪映草稿目录：${targetId}` });
 
     let i = 0;
     let relativePath = '';
@@ -221,9 +223,9 @@ ipcMain.handle('save-file', async (event, { remoteFileUrls, targetId, isOpenDir 
         const fullTargetPath = path.join(baseTargetDir, relativePath);
         const targetDir = path.dirname(fullTargetPath);
 
-        console.log('[log] fullTargetPath: ' + fullTargetPath);
+        logger.info('[log] fullTargetPath: ' + fullTargetPath);
 
-        console.log('[log] targetDir: ' + targetDir);
+        logger.info('[log] targetDir: ' + targetDir);
 
         // 3. 确保目标目录存在
         await fs.mkdir(targetDir, { recursive: true }); // recursive: true 可以创建多级目录
@@ -231,30 +233,30 @@ ipcMain.handle('save-file', async (event, { remoteFileUrls, targetId, isOpenDir 
 
         // 4. 下载文件
 
-        console.log(`[log] start get file context : ${fileUrl}`);
-        await appendLog({ level: 'loading', message: `正在下载草稿内容文件: ${relativePath}` });
+        logger.info(`[log] start get file context : ${fileUrl}`);
+        await appendDownloadLog({ level: 'loading', message: `正在下载草稿内容文件: ${relativePath}` });
 
         await downloadFile(fileUrl, fullTargetPath, targetDir, targetId);
 
-        console.log(`[log] file saved to : ${fullTargetPath}`);
-        await appendLog({ level: 'success', message: `第 ${++i} 个草稿信息文件保存成功` });
+        logger.info(`[log] file saved to : ${fullTargetPath}`);
+        await appendDownloadLog({ level: 'success', message: `第 ${++i} 个草稿信息文件保存成功` });
       } catch (error) {
-        console.error(`[error] download file ${fileUrl} failed:`, error);
+        logger.error(`[error] download file ${fileUrl} failed:`, error);
 
-        await appendLog({ level: 'error', message: `第 ${++i} 个草稿信息文件保存失败` });
+        await appendDownloadLog({ level: 'error', message: `第 ${++i} 个草稿信息文件保存失败` });
         // 你可以决定是继续下载其他文件还是直接抛出错误
         // 这里记录错误但继续尝试下载下一个文件
       }
     }
-    await appendLog({ level: 'all', message: `下载完成：所有 ${targetId} 中的剪映草稿已成功下载！` });
+    await appendDownloadLog({ level: 'all', message: `下载完成：所有 ${targetId} 中的剪映草稿已成功下载！` });
     const jointPath = path.join(baseTargetDir, targetId);
-    console.log(`[finish] all download: ${jointPath}`);
+    logger.info(`[finish] all download: ${jointPath}`);
     if (isOpenDir) await openDirectory(null, jointPath);
     return { success: true, message: `文件批量保存完成，保存至目录: ${jointPath}` };
   } catch (error) {
-    console.error(`[error] 批量保存过程发生错误:`, error);
+    logger.error(`[error] 批量保存过程发生错误:`, error);
 
-    await appendLog({ level: 'error', message: `下载完成：批量保存 ${targetId} 中的剪映草稿过程发生错误！` });
+    await appendDownloadLog({ level: 'error', message: `下载失败：批量保存 ${targetId} 中的剪映草稿过程发生错误！` });
     return { success: false, message: `保存失败: ${error.message} ` };
   }
 });
@@ -285,7 +287,7 @@ function updateValue(current, finalKey, targetDir, oldVal, targetId) {
     const newValue = path.join(targetDir, newRelativePath);
     current[finalKey] = newValue;
 
-    console.log(`✅ newValue to:`, newValue);
+    logger.info(`✅ newValue to:`, newValue);
   }
 }
 
@@ -299,12 +301,12 @@ function modifyJsonValue(jsonData, keyPath, targetDir, targetId) {
   const keys = keyPath.split('.');
   const lastIndex = keys.length - 1;
   let current = jsonData;
-  console.log(`[log] keys:`, jsonData, keys);
+  logger.info(`[log] keys:`, jsonData, keys);
   // 遍历键路径，直到最后一个键之前
   for (let i = 0; i < lastIndex; i++) {
     const key = keys[i];
 
-    console.log(`[log] current[${key}]:`, current[key]);
+    logger.info(`[log] current[${key}]:`, current[key]);
     // 如果路径中的某个键不存在或不是对象，则创建一个空对象（或根据需求抛出错误）
     if (!current.hasOwnProperty(key) || typeof current[key] !== 'object') {
       return;
@@ -343,7 +345,7 @@ async function downloadJsonFile(url, filePath, targetDir, targetId) {
 
     // 检查HTTP状态码
     if (response.status !== 200) {
-      await appendLog({ level: 'error', message: `下载草稿内容文件失败` });
+      await appendDownloadLog({ level: 'error', message: `下载草稿内容文件失败` });
       throw new Error(`[error] request failed, status code: ${response.status}`);
     }
 
@@ -353,10 +355,10 @@ async function downloadJsonFile(url, filePath, targetDir, targetId) {
     // 3. 修改 JSON 数据中指定键的值
     const keyToModify = 'materials.videos.path'; // 你想修改的键
 
-    console.log(`[log] start modifyJsonValue: ${keyToModify}`);
+    logger.info(`[log] start modifyJsonValue: ${keyToModify}`);
     modifyJsonValue(jsonData, keyToModify, targetDir, targetId);
 
-    await appendLog({ level: 'loading', message: `正在将草稿内容文件写入本地草稿目录 ${targetDir}` });
+    await appendDownloadLog({ level: 'loading', message: `正在将草稿内容文件写入本地草稿目录 ${targetDir}` });
 
     // 4. 将修改后的 JSON 对象转换为格式化的字符串并写入本地文件
     const jsonString = JSON.stringify(jsonData, null, 2); // 使用 2 个空格进行缩进，美化输出
@@ -381,13 +383,13 @@ async function downloadNotJsonFile(url, filePath, targetDir) {
 
     // 检查HTTP状态码
     if (response.status !== 200) {
-      await appendLog({ level: 'error', message: `下载草稿内容文件失败` });
+      await appendDownloadLog({ level: 'error', message: `下载草稿内容文件失败` });
       throw new Error(`[error] request failed, status code: ${response.status}`);
     }
 
-    console.log(`[log] start create writable stream: ${filePath}`);
+    logger.info(`[log] start create writable stream: ${filePath}`);
 
-    await appendLog({ level: 'loading', message: `正在将草稿内容文件写入本地草稿目录 ${targetDir}` });
+    await appendDownloadLog({ level: 'loading', message: `正在将草稿内容文件写入本地草稿目录 ${targetDir}` });
 
     // 创建可写流
     const writer = response.data.pipe(createWriteStream(filePath));
@@ -416,10 +418,10 @@ async function downloadNotJsonFile(url, filePath, targetDir) {
 async function downloadFile(url, filePath, targetDir, targetId) {
 
   if (url.endsWith('.json')) {
-    console.log(`[log] start download json file : ${filePath}`);
+    logger.info(`[log] start download json file : ${filePath}`);
     await downloadJsonFile(url, filePath, targetDir, targetId);
   } else {
-    console.log(`[log] start download non-json file : ${filePath}`);
+    logger.info(`[log] start download non-json file : ${filePath}`);
     await downloadNotJsonFile(url, filePath, targetDir);
   }
 }
@@ -429,12 +431,12 @@ async function openDirectory(event, dirPath) {
   try {
     const errorMsg = await shell.openPath(dirPath);
     if (errorMsg) {
-      console.error(`[error] Failed to open path: ${errorMsg}`);
+      logger.error(`[error] Failed to open path: ${errorMsg}`);
       return { success: false, error: errorMsg };
     }
     return { success: true };
   } catch (error) {
-    console.error(`[error] Error opening path: ${error}`);
+    logger.error(`[error] Error opening path: ${error}`);
     return { success: false, error: error.message };
   }
 }

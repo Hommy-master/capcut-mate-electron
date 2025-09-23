@@ -84,13 +84,13 @@ async function initDownload() {
     const emptyLog = document.getElementById("emptyLog");
 
     clearLogBtn.addEventListener("click", function () {
-        window.electronAPI.clearLogData();
+        window.electronAPI.clearDownloadLog();
         logList.innerHTML = "";
         logList.classList.add("hide");
         emptyLog.classList.remove("hide");
     });
 
-    const logData = await window.electronAPI.getLogData();
+    const logData = await window.electronAPI.getDownloadLog();
     if (logData && logData.length > 0) {
         logData.forEach((logEntry) => {
             addLog(logEntry, false);
