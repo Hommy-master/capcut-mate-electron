@@ -280,7 +280,9 @@ function updateValue(current, finalKey, targetDir, oldVal, targetId) {
 
     // 提取ID及之后的部分作为将要下载的路径
     const relativePath = oldVal.substring(idIndex).replaceAll('/', path.sep); // 替换为系统路径分隔符
-    const newValue = path.join(targetDir, relativePath);
+    // targetDir 已包含 targetId 目录，所以relativePath中的targetId要去重
+    const newRelativePath = relativePath.replace(`${targetId}${path.sep}`, '');
+    const newValue = path.join(targetDir, newRelativePath);
     current[finalKey] = newValue;
 
     console.log(`✅ newValue to:`, newValue);
