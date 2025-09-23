@@ -10,7 +10,7 @@ function createWindow() {
   // 创建浏览器窗口
   mainWindow = new BrowserWindow({
     width: 1200,
-    height: 700,
+    height: 768,
     webPreferences: {
       nodeIntegration: false, // 禁用 Node.js 集成（出于安全考虑，强烈推荐）:cite[5]:cite[7]
       contextIsolation: true, // 启用上下文隔离（Electron 12 后默认 true，推荐开启）:cite[3]:cite[7]
