@@ -65,7 +65,7 @@ h1 {
 /* 走马灯样式 */
 .carousel {
     position: relative;
-    height: 300px;
+    height: 240px;
     overflow: hidden;
     border-radius: 8px;
 }
@@ -151,8 +151,8 @@ h1 {
 
 .auto-resize-textarea {
     width: 100%;
-    min-height: 150px;
-    padding: 15px;
+    min-height: 120px;
+    padding: 8px;
     border: 1px solid #ddd;
     border-radius: 8px;
     resize: none;
@@ -253,7 +253,7 @@ input:checked:not(:disabled)+.slider {
 }
 
 input:checked+.slider:before {
-    transform: translateX(26px);
+    transform: translateX(24px);
 }
 
 /* 按钮样式 */
@@ -374,9 +374,9 @@ i.log-icon.error {
 
 
 /* 响应式设计 */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
     .carousel {
-        height: 250px;
+        height: 200px;
     }
 
     .tabs {
@@ -385,11 +385,5 @@ i.log-icon.error {
 
     .tab-btn {
         width: 100%;
-    }
-
-    .module-title {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
     }
 }
