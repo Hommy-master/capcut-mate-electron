@@ -48,16 +48,23 @@ async function initDownload() {
         }
         downloadBtn.disabled = true;
         downloadToggle.disabled = true;
+        const iconItem = downloadBtn.querySelector("i.fas");
+        iconItem.classList.remove('fa-download');
+        iconItem.classList.add('fa-spinner');
+        iconItem.classList.add('fa-spin');
         try {
-            const result = await window.electronAPI.saveFile({
+            await window.electronAPI.saveFile({
                 remoteFileUrls: matchedFiles,
                 targetId,
                 isOpenDir: downloadToggle.checked,
             });
-            // alert(result.message);
         } catch (error) {
             alert("保存文件时出错: " + error.message);
         }
+
+        iconItem.classList.remove('fa-spin');
+        iconItem.classList.remove('fa-spinner');
+        iconItem.classList.add('fa-download');
         downloadBtn.disabled = false;
         downloadToggle.disabled = false;
     }

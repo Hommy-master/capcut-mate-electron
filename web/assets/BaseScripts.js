@@ -116,9 +116,6 @@ function initTextarea() {
             // 更新文本区域内容
             textarea.value = content;
             textarea.dispatchEvent(new Event("input"));
-
-            // 添加日志
-            addLog(`已切换到模板：${this.textContent}`);
         });
     });
 }
