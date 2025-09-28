@@ -15,3 +15,10 @@ npm install --verbose
 ```bash
 npm start
 ```
+
+# 3. 商业合作
+- 微信：
+
+  ![微信](./assets/wechat.png)
+
+- 邮箱：taohongmin51@gmail.com
