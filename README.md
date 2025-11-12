@@ -15,3 +15,15 @@ npm install --verbose
 ```bash
 npm start
 ```
+
+## 开源社区问题交流群
+- 微信群：
+
+  <img src="./assets/wechat-q.jpg" width="344" height="498" alt="剪映小助手">
+
+## 商业合作
+- 微信：
+
+  <img src="./assets/wechat.jpg" width="220" height="220" alt="技术支持微信">
+
+- 邮箱：taohongmin51@gmail.com
