@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const logger = require('./script/logger');
 
 const {
   readDownloadLog,
