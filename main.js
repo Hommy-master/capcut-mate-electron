@@ -48,7 +48,7 @@ ipcMain.handle('get-url-json-data', async (event, remoteUrl) => {
   try {
     return await getDraftUrls(remoteUrl, mainWindow);
   } catch (error) {
-    logger.error(`[error] get draft url:`, error);
+    logger.error(`[error] get draft url failed:`, error);
     return {};
   }
 });
