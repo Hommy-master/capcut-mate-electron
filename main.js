@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 
 const {
@@ -7,6 +7,8 @@ const {
   getDraftUrls,
   downloadFiles
 } = require('./script/download');
+
+const logger = require("./script/logger");
 
 let mainWindow;
 
@@ -46,13 +48,24 @@ ipcMain.handle('get-url-json-data', async (event, remoteUrl) => {
   try {
     return await getDraftUrls(remoteUrl, mainWindow);
   } catch (error) {
-    logger.error(`[error] get draft url:`, error);
+    logger.error(`[error] get draft url failed:`, error);
     return {};
   }
 });
 
 ipcMain.handle('save-file', async (event, config) => {
   await downloadFiles(config, mainWindow);
+});
+
+ipcMain.handle('show-message-box', async (event, options) => {
+  return await dialog.showMessageBox(mainWindow, {
+    type: options.type || 'info',
+    title: options.title || '提示',
+    message: options.message || '',
+    buttons: ['确定'],
+    noLink: true, // 防止按钮以链接样式显示，这通常会使按钮更小更紧凑
+    normalizeAccessKeys: true // 标准化访问键，确保按钮文本格式一致
+  });
 });
 
 

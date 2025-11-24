@@ -25,4 +25,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     removeAllFileOperationLogListeners: () => {
         ipcRenderer.removeAllListeners('file-operation-log');
     },
+    
+    // 显示消息框
+    showMessageBox: (options) => ipcRenderer.invoke('show-message-box', options)
 });
