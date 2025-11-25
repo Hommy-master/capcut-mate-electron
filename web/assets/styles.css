@@ -88,6 +88,16 @@ h1 {
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
 }
 
+.carousel-item.one {
+    background-image: url('./images/one.jpg');
+}
+.carousel-item.two {
+    background-image: url('./images/two.jpg');
+}
+.carousel-item.three {
+    background-image: url('./images/three.jpg');
+}
+
 .carousel-caption {
     background: rgba(0, 0, 0, 0.6);
     padding: 15px;

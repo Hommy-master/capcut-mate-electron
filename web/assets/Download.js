@@ -27,14 +27,20 @@ async function initDownload() {
         const targetId = getQueryParam("draft_id", value);
 
         if (!targetId) {
-            alert(`${value} 中缺少 draft_id 参数`);
+            window.electronAPI.showMessageBox({
+                title: '提示',
+                message: `${value} 中缺少 draft_id 参数`
+            });
             return;
         }
 
         const jsonData = await window.electronAPI.getUrlJsonData(value);
-
         if (jsonData?.code !== 0 || !jsonData?.files) {
-            alert("获取文件列表失败");
+            window.electronAPI.showMessageBox({
+                title: '错误',
+                type: 'error',
+                message: "获取文件列表失败，请确保您输入的地址可正常访问"
+            });
             return;
         }
 
@@ -43,7 +49,11 @@ async function initDownload() {
         );
 
         if (matchedFiles.length === 0) {
-            alert("未找到");
+            window.electronAPI.showMessageBox({
+                title: '错误',
+                type: 'error',
+                message: "未找到包含 draft_id 的文件"
+            });
             return;
         }
         downloadBtn.disabled = true;
@@ -59,7 +69,11 @@ async function initDownload() {
                 isOpenDir: downloadToggle.checked,
             });
         } catch (error) {
-            alert("保存文件时出错: " + error.message);
+            window.electronAPI.showMessageBox({
+                title: '错误',
+                type: 'error',
+                message: "保存文件时出错: " + error.message
+            });
         }
 
         iconItem.classList.remove('fa-spin');
@@ -73,7 +87,10 @@ async function initDownload() {
     downloadBtn.addEventListener("click", async function () {
         const value = textarea.value.trim();
         if (value === "") {
-            alert("内容为空，无法下载");
+            window.electronAPI.showMessageBox({
+                title: '提示',
+                message: "内容为空，无法下载"
+            });
             return;
         }
 
