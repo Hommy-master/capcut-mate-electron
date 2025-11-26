@@ -24,8 +24,8 @@ function createWindow() {
     }
   });
 
-  // 加载应用的index.html
-  mainWindow.loadFile('./web/index.html');
+  // 加载应用的index.html，使用path.join确保路径在开发和生产环境中都能正确解析
+  mainWindow.loadFile(path.join(__dirname, 'web', 'index.html'));
 
   // 开发环境下打开DevTools
   if (!app.isPackaged) {
