@@ -19,6 +19,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 888,
+    icon: path.join(__dirname, 'res', 'logo.png'), // 设置窗口图标
     webPreferences: {
       nodeIntegration: false, // 禁用 Node.js 集成（出于安全考虑，强烈推荐）
       contextIsolation: true, // 启用上下文隔离（Electron 12 后默认 true，推荐开启）

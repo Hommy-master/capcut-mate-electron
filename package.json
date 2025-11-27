@@ -17,7 +17,8 @@
     "appId": "com.gogoshine.capcut-mate",
     "productName": "剪映小助手",
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "res/logo.png"
     },
     "nsis": {
       "oneClick": false,
@@ -42,7 +43,11 @@
           ]
         }
       ],
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "icon": "res/logo.png"
+    },
+    "linux": {
+      "icon": "res/logo.png"
     },
     "publish": false
   },
