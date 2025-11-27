@@ -132,6 +132,32 @@ async function getDraftUrls(remoteUrl, parentWindow) {
   }
 }
 
+async function clearDefaultDraftPath() {
+  try {
+    const configPath = getConfigPath();
+    let config = {};
+
+    // 尝试读取现有配置
+    try {
+      const data = await fs.readFile(configPath, "utf8");
+      config = JSON.parse(data);
+    } catch (error) {
+      // 如果文件不存在，保持config为空对象
+    }
+
+    // 删除targetDirectory字段
+    delete config.targetDirectory;
+
+    // 写回配置文件
+    await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
+    logger.info('默认草稿路径已清空');
+    return { success: true };
+  } catch (error) {
+    logger.error('清空默认草稿路径失败:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 // 提取出来的函数，可选参数parentWindow用于显示对话框时附加到对话框
 async function getTargetDirectory(parentWindow = null) {
   let config = await readConfig();
@@ -341,7 +367,7 @@ async function downloadNotJsonFile(
       writer.on("finish", resolve);
       writer.on("error", (err) => {
         // 尝试删除可能不完整的文件
-        fs.unlink(filePath).catch(() => {});
+        fs.unlink(filePath).catch(() => { });
         reject(new Error(`[error] write file failed: ${err.message}`));
       });
       response.data.on("error", (err) => {
@@ -502,6 +528,8 @@ async function downloadFiles(
 module.exports = {
   readDownloadLog,
   clearDownloadLog,
+
+  clearDefaultDraftPath,
 
   getDraftUrls,
 

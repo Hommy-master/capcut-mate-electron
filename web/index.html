@@ -12,6 +12,9 @@
   </head>
 
   <body>
+    <div class="top-tip" onclick="openLink('http://192.168.10.218:5173/ai-agent/ai-agent')">
+      更多AI知识，免费领，点击进入
+    </div>
     <div class="container">
       <!-- 模块一：走马灯 -->
       <section class="module">
@@ -70,7 +73,7 @@
       </section>
 
       <!-- 模块四：下载开关 -->
-      <section class="module">
+      <section class="module flex space-between">
         <div class="switch-container">
           <label class="switch">
             <input type="checkbox" id="downloadToggle" checked />
@@ -78,6 +81,9 @@
           </label>
           <span>下载后打开草稿路径文件</span>
         </div>
+        <button id="clearDraftPathBtn" class="btn btn-small hide">
+          <i class="fas fa-trash-alt"></i> 删除草稿默认保存目录
+        </button>
       </section>
 
       <!-- 模块五：下载按钮 -->

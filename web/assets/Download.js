@@ -21,6 +21,33 @@ async function initDownload() {
     const downloadToggle = document.getElementById("downloadToggle");
     const downloadBtn = document.getElementById("downloadBtn");
     const textarea = document.querySelector(".auto-resize-textarea");
+    
+    // 清空默认草稿路径按钮功能
+    const clearDraftPathBtn = document.getElementById("clearDraftPathBtn");
+    clearDraftPathBtn.addEventListener("click", async function() {
+        try {
+            const result = await window.electronAPI.clearDefaultDraftPath();
+            if (result.success) {
+                window.electronAPI.showMessageBox({
+                    title: '成功',
+                    type: 'info',
+                    message: '草稿默认保存目录已删除'
+                });
+            } else {
+                window.electronAPI.showMessageBox({
+                    title: '错误',
+                    type: 'error',
+                    message: '删除草稿默认保存目录失败: ' + result.error
+                });
+            }
+        } catch (error) {
+            window.electronAPI.showMessageBox({
+                title: '错误',
+                type: 'error',
+                message: '删除草稿默认保存目录失败: ' + error.message
+            });
+        }
+    });
 
     // 保存文件
     async function saveFile(value) {
@@ -136,7 +163,7 @@ async function initDownload() {
     }
 
     // 添加日志函数
-    function addLog({ message, time, level = "info" }, isNew = true) {
+    function addLog({ message, time = new Date().toLocaleTimeString(), level = "info" }, isNew = true) {
         emptyLog.classList.add("hide");
         logList.classList.remove("hide");
 

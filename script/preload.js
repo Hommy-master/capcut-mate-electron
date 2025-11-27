@@ -27,5 +27,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
     
     // 显示消息框
-    showMessageBox: (options) => ipcRenderer.invoke('show-message-box', options)
+    showMessageBox: (options) => ipcRenderer.invoke('show-message-box', options),
+    
+    // 清空默认草稿路径
+    clearDefaultDraftPath: () => ipcRenderer.invoke('clear-default-draft-path'),
+    
+    // 在默认浏览器中打开URL
+    openExternalUrl: (url) => ipcRenderer.invoke('open-external-url', url)
 });

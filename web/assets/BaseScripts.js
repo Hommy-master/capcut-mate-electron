@@ -73,11 +73,11 @@ function initTextarea() {
             content:
                 "https://cm.jcaigc.cn/openapi/v1/get_draft?draft_id=202509151914009cdf8766",
         },
-        template3: {
-            title: "案例三",
-            content:
-                "https://cm.jcaigc.cn/openapi/v1/get_draft?draft_id=2025091519145792de542a",
-        },
+        // template3: {
+        //     title: "案例三",
+        //     content:
+        //         "https://cm.jcaigc.cn/openapi/v1/get_draft?draft_id=2025091519145792de542a",
+        // },
     };
 
     // 动态生成Tab按钮
@@ -116,6 +116,17 @@ function initTextarea() {
             // 更新文本区域内容
             textarea.value = content;
             textarea.dispatchEvent(new Event("input"));
+        });
+    });
+}
+
+function openLink(url) {
+    window.electronAPI.openExternalUrl(url).catch(error => {
+        console.error('打开URL失败:', error);
+        window.electronAPI.showMessageBox({
+            title: '失败',
+            type: 'error',
+            message: '无法打开链接，请稍后再试'
         });
     });
 }

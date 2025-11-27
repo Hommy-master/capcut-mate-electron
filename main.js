@@ -1,10 +1,12 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 const {
   readDownloadLog,
   clearDownloadLog,
   getDraftUrls,
+  clearDefaultDraftPath,
   downloadFiles
 } = require('./script/download');
 
@@ -20,11 +22,10 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false, // 禁用 Node.js 集成（出于安全考虑，强烈推荐）
       contextIsolation: true, // 启用上下文隔离（Electron 12 后默认 true，推荐开启）
-      preload: path.join(__dirname, './script/preload.js') // 指定预加载脚本的绝对路径
+      preload: path.join(__dirname, 'script', 'preload.js') // 指定预加载脚本的绝对路径
     }
   });
 
-  // 加载应用的index.html，使用path.join确保路径在开发和生产环境中都能正确解析
   mainWindow.loadFile(path.join(__dirname, 'web', 'index.html'));
 
   // 开发环境下打开DevTools
@@ -66,6 +67,46 @@ ipcMain.handle('show-message-box', async (event, options) => {
     noLink: true, // 防止按钮以链接样式显示，这通常会使按钮更小更紧凑
     normalizeAccessKeys: true // 标准化访问键，确保按钮文本格式一致
   });
+});
+
+// 清空默认草稿路径
+ipcMain.handle('clear-default-draft-path', async (event) => {
+  try {
+    const configPath = path.join(app.getPath('userData'), 'app-config.json');
+    let config = {};
+    
+    // 尝试读取现有配置
+    try {
+      const data = await fs.promises.readFile(configPath, 'utf8');
+      config = JSON.parse(data);
+    } catch (error) {
+      // 如果文件不存在，保持config为空对象
+    }
+    
+    // 删除targetDirectory字段
+    delete config.targetDirectory;
+    
+    // 写回配置文件
+    await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
+    logger.info('默认草稿路径已清空');
+    return { success: true };
+  } catch (error) {
+    logger.error('清空默认草稿路径失败:', error);
+    return { success: false, error: error.message };
+  }
+});
+
+// 在默认浏览器中打开URL
+ipcMain.handle('open-external-url', async (event, url) => {
+  try {
+    const { shell } = require('electron');
+    await shell.openExternal(url);
+    logger.info(`已在默认浏览器中打开URL: ${url}`);
+    return { success: true };
+  } catch (error) {
+    logger.error(`打开URL失败: ${url}`, error);
+    return { success: false, error: error.message };
+  }
 });
 
 
