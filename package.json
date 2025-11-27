@@ -18,7 +18,7 @@
     "productName": "剪映小助手",
     "win": {
       "target": "nsis",
-      "icon": "res/logo.png"
+      "icon": "web/assets/images/logo.png"
     },
     "nsis": {
       "oneClick": false,
@@ -44,10 +44,10 @@
         }
       ],
       "category": "public.app-category.productivity",
-      "icon": "res/logo.png"
+      "icon": "web/assets/images/logo.png"
     },
     "linux": {
-      "icon": "res/logo.png"
+      "icon": "web/assets/images/logo.png"
     },
     "publish": false
   },
