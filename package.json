@@ -26,7 +26,7 @@
     "publish": false,
     "win": {
       "target": "nsis",
-      "icon": "./resources/icon/logo.ico",
+      "icon": "resources/icon/logo.ico",
       "signAndEditExecutable": false
     },
     "nsis": {
@@ -34,9 +34,9 @@
       "allowToChangeInstallationDirectory": true,
       "perMachine": false,
       "allowElevation": false,
-      "installerIcon": "./resources/icon/logo.ico",
-      "uninstallerIcon": "./resources/icon/logo.ico",
-      "installerHeaderIcon": "./resources/icon/logo.ico"
+      "installerIcon": "resources/icon/logo.ico",
+      "uninstallerIcon": "resources/icon/logo.ico",
+      "installerHeaderIcon": "resources/icon/logo.ico"
     },
     "mac": {
       "target": [
@@ -56,10 +56,10 @@
         }
       ],
       "category": "public.app-category.productivity",
-      "icon": "./resources/icon/logo.icns"
+      "icon": "resources/icon/logo.icns"
     },
     "linux": {
-      "icon": "./resources/icon/logo.png"
+      "icon": "resources/icon/logo.png"
     }
   },
   "author": "gogoshine",

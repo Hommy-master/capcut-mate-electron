@@ -17,12 +17,20 @@ let mainWindow;
 function findIconPath() {
   let iconPath = null;
 
+  // 根据不同平台选择不同的图标文件
+  let iconName = 'logo.png';
+  if (process.platform === 'win32') {
+    iconName = 'logo.ico';
+  } else if (process.platform === 'darwin') {
+    iconName = 'logo.icns';
+  }
+
   // 尝试多个可能的图标路径
   const possiblePaths = [
-    path.join(__dirname, 'resources', 'icon', 'logo.ico'),
-    path.join(__dirname, 'icon', 'logo.ico'),
-    path.join(process.resourcesPath, 'icon', 'logo.ico'),
-    path.resolve(__dirname, 'resources', 'icon', 'logo.ico')
+    path.join(__dirname, 'resources', 'icon', iconName),
+    path.join(__dirname, 'resources', 'icon', 'logo.png'), // fallback to png
+    path.join(process.resourcesPath, 'icon', iconName),
+    path.resolve(__dirname, 'resources', 'icon', iconName)
   ];
 
   // 找到第一个存在的图标文件
@@ -44,7 +52,7 @@ function setWindowIcon() {
   const iconPath = findIconPath();
 
   // 设置窗口图标
-  if (iconPath) {
+  if (iconPath && mainWindow) {
     try {
       mainWindow.setIcon(iconPath);
       console.info('[win icon set] success');
@@ -52,7 +60,7 @@ function setWindowIcon() {
       console.error('[win icon set] fail:', error);
     }
   } else {
-    console.warn('[WARN] no find icon');
+    console.warn('[WARN] no find icon or mainWindow not ready');
   }
 }
 
@@ -75,9 +83,11 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, 'web', 'index.html'));
 
   // 延迟设置图标，确保窗口完全创建
-  setTimeout(() => {
-    setWindowIcon();
-  }, 500);
+  if (process.platform !== 'darwin') { // macOS不需要额外设置图标
+    setTimeout(() => {
+      setWindowIcon();
+    }, 500);
+  }
 }
 
 // 当Electron完成初始化并准备创建浏览器窗口时调用此方法
