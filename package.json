@@ -11,7 +11,8 @@
   },
   "devDependencies": {
     "electron": "^36.8.1",
-    "electron-builder": "^25.1.8"
+    "electron-builder": "^25.1.8",
+    "dmg-license": "^1.0.11"
   },
   "build": {
     "appId": "com.gogoshine.capcut-mate",
@@ -56,7 +57,10 @@
         }
       ],
       "category": "public.app-category.productivity",
-      "icon": "resources/icon/logo.icns"
+      "icon": "resources/icon/logo.icns",
+      "extendInfo": {
+        "NSAppleEventsUsageDescription": "Application requires access to Apple Events to function properly"
+      }
     },
     "linux": {
       "icon": "resources/icon/logo.png"
