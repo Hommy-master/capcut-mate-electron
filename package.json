@@ -25,7 +25,6 @@
         "to": "icon"
       }
     ],
-    "asar": false,
     "publish": false,
     "win": {
       "target": "nsis",
