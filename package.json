@@ -15,10 +15,19 @@
   },
   "build": {
     "appId": "com.gogoshine.capcut-mate",
-    "productName": "剪映小助手",
+    "productName": "路飞剪映小助手",
+    "extraResources": [
+      {
+        "from": "resources/icon",
+        "to": "icon"
+      }
+    ],
+    "asar": false,
+    "publish": false,
     "win": {
       "target": "nsis",
-      "icon": "web/assets/images/logo.png"
+      "icon": "./resources/icon/logo.ico",
+      "signAndEditExecutable": false
     },
     "nsis": {
       "oneClick": false,
@@ -44,12 +53,11 @@
         }
       ],
       "category": "public.app-category.productivity",
-      "icon": "web/assets/images/logo.png"
+      "icon": "./resources/icon/logo.icns"
     },
     "linux": {
-      "icon": "web/assets/images/logo.png"
-    },
-    "publish": false
+      "icon": "./resources/icon/logo.png"
+    }
   },
   "author": "gogoshine",
   "license": "MIT",

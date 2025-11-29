@@ -14,12 +14,61 @@ const logger = require("./script/logger");
 
 let mainWindow;
 
+if (process.platform === 'win32') {
+  app.setAppUserModelId('com.gogoshine.capcut-mate');
+}
+
+function findIconPath() {
+  let iconPath = null;
+
+  // 尝试多个可能的图标路径
+  const possiblePaths = [
+    path.join(__dirname, 'resources', 'icon', 'logo.ico'),
+    path.join(__dirname, 'icon', 'logo.ico'),
+    path.join(process.resourcesPath, 'icon', 'logo.ico'),
+    path.resolve(__dirname, 'resources', 'icon', 'logo.ico')
+  ];
+
+  // 找到第一个存在的图标文件
+  for (const possiblePath of possiblePaths) {
+    console.info(`[win icon check] path: ${possiblePath}`);
+    if (fs.existsSync(possiblePath)) {
+      iconPath = possiblePath;
+      console.info(`[win icon haved] path: ${iconPath}`);
+      break;
+    } else {
+      console.warn(`[win icon noexist] path: ${possiblePath}`);
+    }
+  }
+
+  return iconPath;
+}
+
+function setWindowIcon() {
+  const iconPath = findIconPath();
+
+  // 设置窗口图标
+  if (iconPath) {
+    try {
+      mainWindow.setIcon(iconPath);
+      console.info('[win icon set] success');
+    } catch (error) {
+      console.error('[win icon set] fail:', error);
+    }
+  } else {
+    console.warn('[WARN] no find icon');
+  }
+}
+
 function createWindow() {
-  // 创建浏览器窗口
+  // 先查找图标路径
+  const iconPath = findIconPath();
+
+  // 创建浏览器窗口，直接在选项中设置icon
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 888,
-    icon: path.join(__dirname, 'web', 'assets', 'images', 'logo.png'), // 设置窗口图标
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: false, // 禁用 Node.js 集成（出于安全考虑，强烈推荐）
       contextIsolation: true, // 启用上下文隔离（Electron 12 后默认 true，推荐开启）
@@ -28,15 +77,16 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'web', 'index.html'));
-
-  // 开发环境下打开DevTools
-  if (!app.isPackaged) {
-    mainWindow.webContents.openDevTools();
-  }
 }
 
 // 当Electron完成初始化并准备创建浏览器窗口时调用此方法
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+
+  setTimeout(() => {
+    setWindowIcon();
+  }, 500);
+});
 
 ipcMain.handle('get-download-log', async (event) => {
   return await readDownloadLog();
@@ -72,29 +122,7 @@ ipcMain.handle('show-message-box', async (event, options) => {
 
 // 清空默认草稿路径
 ipcMain.handle('clear-default-draft-path', async (event) => {
-  try {
-    const configPath = path.join(app.getPath('userData'), 'app-config.json');
-    let config = {};
-    
-    // 尝试读取现有配置
-    try {
-      const data = await fs.promises.readFile(configPath, 'utf8');
-      config = JSON.parse(data);
-    } catch (error) {
-      // 如果文件不存在，保持config为空对象
-    }
-    
-    // 删除targetDirectory字段
-    delete config.targetDirectory;
-    
-    // 写回配置文件
-    await fs.promises.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
-    logger.info('默认草稿路径已清空');
-    return { success: true };
-  } catch (error) {
-    logger.error('清空默认草稿路径失败:', error);
-    return { success: false, error: error.message };
-  }
+  return await clearDefaultDraftPath();
 });
 
 // 在默认浏览器中打开URL
