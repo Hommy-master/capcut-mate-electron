@@ -33,7 +33,10 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "perMachine": false,
-      "allowElevation": false
+      "allowElevation": false,
+      "installerIcon": "./resources/icon/logo.ico",
+      "uninstallerIcon": "./resources/icon/logo.ico",
+      "installerHeaderIcon": "./resources/icon/logo.ico"
     },
     "mac": {
       "target": [

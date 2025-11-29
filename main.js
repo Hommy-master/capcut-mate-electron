@@ -14,10 +14,6 @@ const logger = require("./script/logger");
 
 let mainWindow;
 
-if (process.platform === 'win32') {
-  app.setAppUserModelId('com.gogoshine.capcut-mate');
-}
-
 function findIconPath() {
   let iconPath = null;
 
@@ -77,15 +73,16 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'web', 'index.html'));
+
+  // 延迟设置图标，确保窗口完全创建
+  setTimeout(() => {
+    setWindowIcon();
+  }, 500);
 }
 
 // 当Electron完成初始化并准备创建浏览器窗口时调用此方法
 app.whenReady().then(() => {
   createWindow();
-
-  setTimeout(() => {
-    setWindowIcon();
-  }, 500);
 });
 
 ipcMain.handle('get-download-log', async (event) => {
