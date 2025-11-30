@@ -6,9 +6,9 @@
   "scripts": {
     "start": "electron --enable-logging --v=1 .",
     "build-win": "electron-packager . CapCut-Mate --platform=win32 --arch=x64 --out=dist --overwrite --icon=resources/icon/logo.ico",
-    "build-mac": "electron-packager . CapCut-Mate --platform=darwin --arch=x64 --out=dist --overwrite --icon=resources/icon/logo.icns",
+    "build-mac": "electron-packager . CapCut-Mate --platform=darwin --arch=arm64 --out=dist --overwrite --icon=resources/icon/logo.icns",
     "build-win-installer": "electron-builder --win nsis --x64 --config electron-builder.config.js --publish never",
-    "build-mac-installer": "electron-builder --mac --config electron-builder.config.js --publish never"
+    "build-mac-installer": "electron-builder --mac --arm64 --config electron-builder.config.js --publish never"
   },
   "devDependencies": {
     "electron": "31.7.6",

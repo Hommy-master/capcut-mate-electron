@@ -28,20 +28,13 @@ module.exports = {
     installerHeaderIcon: "resources/icon/logo.ico"
   },
   mac: {
+    // 支持单独构建不同架构
     target: [
       {
-        target: "dmg",
-        arch: [
-          "x64",
-          "arm64"
-        ]
+        target: "dmg"
       },
       {
-        target: "zip",
-        arch: [
-          "x64",
-          "arm64"
-        ]
+        target: "zip"
       }
     ],
     category: "public.app-category.productivity",
