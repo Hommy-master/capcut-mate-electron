@@ -19,9 +19,7 @@ module.exports = {
     target: "nsis",
     artifactName: "capcut-mate-windows-x64-installer.exe",
     // 禁用代码签名
-    signingHashAlgorithms: [],
-    signAndEditExecutable: false,
-    verifyUpdateCodeSignature: false
+    signingHashAlgorithms: []
   },
   nsis: {
     oneClick: false,
