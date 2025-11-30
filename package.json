@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron --enable-logging --v=1 .",
-    "build-win": "electron-packager . capcut-mate --platform=win32 --arch=x64 --out=dist --overwrite --icon=resources/icon/logo.ico",
-    "build-mac": "electron-packager . capcut-mate --platform=darwin --arch=x64 --out=dist --overwrite --icon=resources/icon/logo.icns",
+    "build-win": "electron-packager . CapCut-Mate --platform=win32 --arch=x64 --out=dist --overwrite --icon=resources/icon/logo.ico",
+    "build-mac": "electron-packager . CapCut-Mate --platform=darwin --arch=x64 --out=dist --overwrite --icon=resources/icon/logo.icns",
     "build-win-installer": "electron-builder --win nsis --x64 --config electron-builder.config.js --publish never",
     "build-mac-installer": "electron-builder --mac --x64 --config electron-builder.config.js --publish never"
   },
