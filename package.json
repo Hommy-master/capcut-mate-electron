@@ -5,69 +5,20 @@
   "main": "main.js",
   "scripts": {
     "start": "electron --enable-logging --v=1 .",
-    "build-win": "electron-builder --win",
-    "build-mac": "electron-builder --mac",
-    "build-linux": "electron-builder --linux"
+    "build-win": "electron-packager . capcut-mate --platform=win32 --arch=x64 --out=dist --overwrite --icon=resources/icon/logo.ico",
+    "build-mac": "electron-packager . capcut-mate --platform=darwin --arch=x64 --out=dist --overwrite --icon=resources/icon/logo.icns",
+    "build-win-installer": "electron-builder --win nsis --x64 --config electron-builder.config.js --publish never",
+    "build-mac-installer": "electron-builder --mac --x64 --config electron-builder.config.js --publish never"
   },
   "devDependencies": {
     "electron": "31.7.6",
-    "electron-builder": "^26.1.0"
+    "electron-builder": "^26.1.0",
+    "@electron/packager": "^18.3.5"
   },
   "optionalDependencies": {
     "dmg-license": "^1.0.11"
   },
-  "build": {
-    "appId": "com.gogoshine.capcut-mate",
-    "productName": "路飞剪映小助手",
-    "extraResources": [
-      {
-        "from": "resources/icon",
-        "to": "icon"
-      }
-    ],
-    "publish": false,
-    "win": {
-      "target": "nsis",
-      "icon": "resources/icon/logo.ico",
-      "signAndEditExecutable": false,
-      "verifyUpdateCodeSignature": false
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "perMachine": false,
-      "allowElevation": false,
-      "installerIcon": "resources/icon/logo.ico",
-      "uninstallerIcon": "resources/icon/logo.ico",
-      "installerHeaderIcon": "resources/icon/logo.ico"
-    },
-    "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        },
-        {
-          "target": "zip",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
-      ],
-      "category": "public.app-category.productivity",
-      "icon": "resources/icon/logo.icns",
-      "extendInfo": {
-        "NSAppleEventsUsageDescription": "Application requires access to Apple Events to function properly"
-      }
-    },
-    "linux": {
-      "icon": "resources/icon/logo.png"
-    }
-  },
+
   "author": "gogoshine",
   "license": "MIT",
   "dependencies": {
