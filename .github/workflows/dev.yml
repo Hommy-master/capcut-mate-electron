@@ -69,7 +69,7 @@ jobs:
           name: Release ${{ github.ref_name }}
           files: |
             dist/capcut-mate-windows-x64-installer.exe
-            dist/capcut-mate-macos-apple.dmg
+            dist/capcut-mate-macos-arm64-installer.dmg
           overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
