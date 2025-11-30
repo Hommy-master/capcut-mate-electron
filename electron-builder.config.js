@@ -7,13 +7,6 @@ module.exports = {
   directories: {
     output: "dist"
   },
-  extraResources: [
-    {
-      from: "assets/icon",
-      to: "icon"
-    }
-  ],
-  publish: false,
   win: {
     icon: "assets/icon/logo.ico",
     target: "nsis",
@@ -24,10 +17,6 @@ module.exports = {
   nsis: {
     oneClick: false,
     allowToChangeInstallationDirectory: true,
-    // perMachine: false,
-    // installerIcon: "assets/icon/logo.ico",
-    // uninstallerIcon: "assets/icon/logo.ico",
-    // installerHeaderIcon: "assets/icon/logo.ico"
   },
   mac: {
     icon: "assets/icon/logo.icns",
