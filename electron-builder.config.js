@@ -4,6 +4,9 @@
 module.exports = {
   appId: "com.gogoshine.capcut-mate",
   productName: "CapCut Mate",
+  directories: {
+    output: "dist"
+  },
   extraResources: [
     {
       from: "resources/icon",
@@ -12,11 +15,13 @@ module.exports = {
   ],
   publish: false,
   win: {
-    target: "nsis",
     icon: "resources/icon/logo.ico",
+    target: "nsis",
+    artifactName: "capcut-mate-windows-x64-installer.exe",
+    // 禁用代码签名
+    signingHashAlgorithms: [],
     signAndEditExecutable: false,
-    verifyUpdateCodeSignature: false,
-    artifactName: "capcut-mate-windows-x64-installer.exe"
+    verifyUpdateCodeSignature: false
   },
   nsis: {
     oneClick: false,
@@ -28,30 +33,31 @@ module.exports = {
     installerHeaderIcon: "resources/icon/logo.ico"
   },
   mac: {
-    // 支持单独构建不同架构
-    target: [
-      {
-        target: "dmg"
-      },
-      {
-        target: "zip"
-      }
-    ],
-    category: "public.app-category.productivity",
     icon: "resources/icon/logo.icns",
-    extendInfo: {
-      "NSAppleEventsUsageDescription": "Application requires access to Apple Events to function properly"
-    },
-    artifactName: "capcut-mate-macos-apple.dmg"
+    target: "dmg",
+    artifactName: "capcut-mate-macos-apple.dmg",
+    category: "public.app-category.productivity"
   },
   dmg: {
-    // 最简化的 dmg 配置
-    writeUpdateInfo: false,
-    sign: false,
-    format: "UDZO"
+    background: null,
+    window: {
+      width: 540,
+      height: 380
+    },
+    contents: [
+      {
+        x: 130,
+        y: 150,
+        type: "file"
+      },
+      {
+        x: 410,
+        y: 150,
+        type: "link",
+        path: "/Applications"
+      }
+    ]
   },
-  compression: "store",
-  forceCodeSigning: false,
   linux: {
     icon: "resources/icon/logo.png"
   }
