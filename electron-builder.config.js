@@ -26,11 +26,10 @@ module.exports = {
   nsis: {
     oneClick: false,
     allowToChangeInstallationDirectory: true,
-    perMachine: false,
-    allowElevation: false,
-    installerIcon: "resources/icon/logo.ico",
-    uninstallerIcon: "resources/icon/logo.ico",
-    installerHeaderIcon: "resources/icon/logo.ico"
+    // perMachine: false,
+    // installerIcon: "resources/icon/logo.ico",
+    // uninstallerIcon: "resources/icon/logo.ico",
+    // installerHeaderIcon: "resources/icon/logo.ico"
   },
   mac: {
     icon: "resources/icon/logo.icns",
