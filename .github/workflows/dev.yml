@@ -2,10 +2,10 @@ name: Build
 
 on:
   push:
-    branches: [ lufeixuecheng ]
+    branches: [ main ]
     tags: [ 'v*' ]
   pull_request:
-    branches: [ lufeixuecheng ]
+    branches: [ main ]
 
 jobs:
   build:
