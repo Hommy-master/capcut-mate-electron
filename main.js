@@ -14,65 +14,11 @@ const logger = require("./script/logger");
 
 let mainWindow;
 
-function findIconPath() {
-  let iconPath = null;
-
-  // 根据不同平台选择不同的图标文件
-  let iconName = 'logo.png';
-  if (process.platform === 'win32') {
-    iconName = 'logo.ico';
-  } else if (process.platform === 'darwin') {
-    iconName = 'logo.icns';
-  }
-
-  // 尝试多个可能的图标路径
-  const possiblePaths = [
-    path.join(__dirname, 'resources', 'icon', iconName),
-    path.join(__dirname, 'resources', 'icon', 'logo.png'), // fallback to png
-    path.join(process.resourcesPath, 'icon', iconName),
-    path.resolve(__dirname, 'resources', 'icon', iconName)
-  ];
-
-  // 找到第一个存在的图标文件
-  for (const possiblePath of possiblePaths) {
-    console.info(`[win icon check] path: ${possiblePath}`);
-    if (fs.existsSync(possiblePath)) {
-      iconPath = possiblePath;
-      console.info(`[win icon haved] path: ${iconPath}`);
-      break;
-    } else {
-      console.warn(`[win icon noexist] path: ${possiblePath}`);
-    }
-  }
-
-  return iconPath;
-}
-
-function setWindowIcon() {
-  const iconPath = findIconPath();
-
-  // 设置窗口图标
-  if (iconPath && mainWindow) {
-    try {
-      mainWindow.setIcon(iconPath);
-      console.info('[win icon set] success');
-    } catch (error) {
-      console.error('[win icon set] fail:', error);
-    }
-  } else {
-    console.warn('[WARN] no find icon or mainWindow not ready');
-  }
-}
-
 function createWindow() {
-  // 先查找图标路径
-  const iconPath = findIconPath();
-
-  // 创建浏览器窗口，直接在选项中设置icon
+  // 创建浏览器窗口
   mainWindow = new BrowserWindow({
     width: 1440,
     height: 888,
-    icon: iconPath,
     webPreferences: {
       nodeIntegration: false, // 禁用 Node.js 集成（出于安全考虑，强烈推荐）
       contextIsolation: true, // 启用上下文隔离（Electron 12 后默认 true，推荐开启）
@@ -81,13 +27,6 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'web', 'index.html'));
-
-  // 延迟设置图标，确保窗口完全创建
-  if (process.platform !== 'darwin') { // macOS不需要额外设置图标
-    setTimeout(() => {
-      setWindowIcon();
-    }, 500);
-  }
 }
 
 // 当Electron完成初始化并准备创建浏览器窗口时调用此方法

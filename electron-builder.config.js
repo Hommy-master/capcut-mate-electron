@@ -9,13 +9,13 @@ module.exports = {
   },
   extraResources: [
     {
-      from: "resources/icon",
+      from: "assets/icon",
       to: "icon"
     }
   ],
   publish: false,
   win: {
-    icon: "resources/icon/logo.ico",
+    icon: "assets/icon/logo.ico",
     target: "nsis",
     artifactName: "capcut-mate-windows-x64-installer.exe",
     // 禁用代码签名
@@ -27,12 +27,12 @@ module.exports = {
     oneClick: false,
     allowToChangeInstallationDirectory: true,
     // perMachine: false,
-    // installerIcon: "resources/icon/logo.ico",
-    // uninstallerIcon: "resources/icon/logo.ico",
-    // installerHeaderIcon: "resources/icon/logo.ico"
+    // installerIcon: "assets/icon/logo.ico",
+    // uninstallerIcon: "assets/icon/logo.ico",
+    // installerHeaderIcon: "assets/icon/logo.ico"
   },
   mac: {
-    icon: "resources/icon/logo.icns",
+    icon: "assets/icon/logo.icns",
     target: "dmg",
     artifactName: "capcut-mate-macos-apple.dmg",
     category: "public.app-category.productivity"
@@ -58,6 +58,6 @@ module.exports = {
     ]
   },
   linux: {
-    icon: "resources/icon/logo.png"
+    icon: "assets/icon/logo.png"
   }
 };
