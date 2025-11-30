@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, nativeImage  } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -6,8 +6,9 @@ const {
   readDownloadLog,
   clearDownloadLog,
   getDraftUrls,
-  clearDefaultDraftPath,
-  downloadFiles
+  updateDraftPath,
+  downloadFiles,
+  readConfig
 } = require('./script/download');
 
 const logger = require("./script/logger");
@@ -15,10 +16,11 @@ const logger = require("./script/logger");
 let mainWindow;
 
 function createWindow() {
-  // 创建浏览器窗口
+  mainWindow = null;
+
   mainWindow = new BrowserWindow({
-    width: 1440,
-    height: 888,
+    width: 1366,
+    height: 768,
     webPreferences: {
       nodeIntegration: false, // 禁用 Node.js 集成（出于安全考虑，强烈推荐）
       contextIsolation: true, // 启用上下文隔离（Electron 12 后默认 true，推荐开启）
@@ -27,6 +29,10 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'web', 'index.html'));
+
+  mainWindow.on('closed', function () {
+    mainWindow = null;
+  });
 }
 
 // 当Electron完成初始化并准备创建浏览器窗口时调用此方法
@@ -66,9 +72,13 @@ ipcMain.handle('show-message-box', async (event, options) => {
   });
 });
 
-// 清空默认草稿路径
-ipcMain.handle('clear-default-draft-path', async (event) => {
-  return await clearDefaultDraftPath();
+ipcMain.handle('get-config-data', async (event) => {
+  return await readConfig();
+});
+
+// 设置默认草稿路径
+ipcMain.handle('update-draft-path', async (event) => {
+  return await updateDraftPath(mainWindow);
 });
 
 // 在默认浏览器中打开URL

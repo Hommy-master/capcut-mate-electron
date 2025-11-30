@@ -16,6 +16,12 @@
       更多AI知识，免费领，点击进入路飞学城官网
     </div>
     <div class="container">
+      <!-- 设置按钮 -->
+      <div class="settings-button-container">
+        <button id="settingsBtn" class="btn btn-settings">
+          <i class="fas fa-cog"></i> 设置
+        </button>
+      </div>
       <!-- 模块一：走马灯 -->
       <section class="module">
         <div class="carousel">
@@ -108,13 +114,196 @@
 
     <script src="./assets/BaseScripts.js"></script>
     <script src="./assets/Download.js"></script>
+    <script src="./assets/Settings.js"></script>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         initCarousel();
         initTextarea();
         initDownload();
+        initSettings();
       });
     </script>
+    <!-- 设置窗口 -->
+    <div id="settingsWindow" class="settings-window hide">
+      <div class="settings-overlay"></div>
+      <div class="settings-content">
+        <div class="settings-header">
+          <h3><i class="fas fa-cog"></i> 设置</h3>
+          <button id="closeSettingsBtn" class="settings-close">&times;</button>
+        </div>
+        <div class="settings-body">
+          <div class="settings-group">
+            <label for="draftPath">剪映路径设置</label>
+            <div class="path-input-group">
+              <input type="text" id="draftPath" class="draft-path-input" placeholder="请选择草稿保存路径" readonly />
+              <button id="selectPathBtn" class="btn btn-small">选择...</button>
+            </div>
+            <p class="settings-hint">设置剪映软件的草稿路径以导入草稿至剪映</p>
+          </div>
+        </div>
+        <!-- <div class="settings-footer">
+          <button id="saveSettingsBtn" class="btn btn-primary">保存设置</button>
+        </div> -->
+      </div>
+    </div>
+
+    <style>
+      /* 设置按钮样式 */
+      .settings-button-container {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+      }
+      
+      .btn-settings {
+        background-color: #3498db;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      
+      .btn-settings:hover {
+        background-color: #2980b9;
+      }
+      
+      /* 设置窗口样式 */
+      .settings-window {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .settings-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      
+      .settings-content {
+        position: relative;
+        background-color: white;
+        border-radius: 10px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+      
+      .settings-header {
+        background-color: #2c3e50;
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .settings-header h3 {
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .settings-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .settings-body {
+        padding: 20px;
+      }
+      
+      .settings-group {
+        margin-bottom: 20px;
+      }
+      
+      .settings-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #2c3e50;
+      }
+      
+      .path-input-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 5px;
+      }
+      
+      .draft-path-input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+      
+      .btn-small {
+        padding: 8px 16px;
+        font-size: 14px;
+        background-color: #3498db;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      
+      .btn-small:hover {
+        background-color: #2980b9;
+      }
+      
+      .settings-hint {
+        font-size: 12px;
+        color: #7f8c8d;
+        margin: 5px 0 0 0;
+      }
+      
+      .settings-footer {
+        background-color: #ecf0f1;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      
+      .btn-primary {
+        padding: 10px 20px;
+        background-color: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      
+      .btn-primary:hover {
+        background-color: #229954;
+      }
+    </style>
   </body>
 </html>

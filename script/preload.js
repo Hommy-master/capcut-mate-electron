@@ -33,5 +33,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
     clearDefaultDraftPath: () => ipcRenderer.invoke('clear-default-draft-path'),
     
     // 在默认浏览器中打开URL
-    openExternalUrl: (url) => ipcRenderer.invoke('open-external-url', url)
+    openExternalUrl: (url) => ipcRenderer.invoke('open-external-url', url),
+    
+    // 获取草稿保存路径
+    getConfigData: () => ipcRenderer.invoke('get-config-data'),
+    
+    // 设置草稿保存路径
+    updateDraftPath: () => ipcRenderer.invoke('update-draft-path')
 });

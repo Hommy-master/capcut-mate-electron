@@ -8,7 +8,7 @@ module.exports = {
     output: "dist"
   },
   win: {
-    icon: "assets/icon/logo.ico",
+    icon: "assets/icons/logo.ico",
     target: "nsis",
     artifactName: "capcut-mate-windows-x64-installer.exe",
     // 禁用代码签名
@@ -19,7 +19,7 @@ module.exports = {
     allowToChangeInstallationDirectory: true,
   },
   mac: {
-    icon: "assets/icon/logo.icns",
+    icon: "assets/icons/logo.icns",
     target: "dmg",
     artifactName: "capcut-mate-macos-arm64-installer.dmg",
     category: "public.app-category.productivity"
@@ -43,8 +43,5 @@ module.exports = {
         path: "/Applications"
       }
     ]
-  },
-  linux: {
-    icon: "assets/icon/logo.png"
   }
 };

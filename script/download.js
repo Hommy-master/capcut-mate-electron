@@ -24,7 +24,7 @@ async function readConfig() {
   logger.info("[log] Config path:", configPath);
   try {
     const data = await fs.readFile(configPath, "utf8");
-    return JSON.parse(data);
+    return JSON.parse(data) || {};
   } catch (error) {
     return {};
   }
@@ -132,7 +132,11 @@ async function getDraftUrls(remoteUrl, parentWindow) {
   }
 }
 
-async function clearDefaultDraftPath() {
+async function updateDraftPath(parentWindow) {
+  const targetDir = await getTargetDirectory(parentWindow, true);
+  if (!targetDir) {
+    throw new Error("用户取消了目录选择");
+  }
   try {
     const configPath = getConfigPath();
     let config = {};
@@ -145,23 +149,22 @@ async function clearDefaultDraftPath() {
       // 如果文件不存在，保持config为空对象
     }
 
-    // 删除targetDirectory字段
-    delete config.targetDirectory;
+    config.targetDirectory = targetDir;
 
     // 写回配置文件
     await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf8');
-    logger.info('默认草稿路径已清空');
-    return { success: true };
+    logger.info('默认草稿路径已更新为:', targetDir);
+    return { success: true, targetDir };
   } catch (error) {
-    logger.error('清空默认草稿路径失败:', error);
+    logger.error('更新默认草稿路径失败:', error);
     return { success: false, error: error.message };
   }
 }
 
 // 提取出来的函数，可选参数parentWindow用于显示对话框时附加到对话框
-async function getTargetDirectory(parentWindow = null) {
+async function getTargetDirectory(parentWindow = null, isUpdate = false) {
   let config = await readConfig();
-  if (config.targetDirectory) {
+  if (!isUpdate && config.targetDirectory) {
     try {
       await fs.access(config.targetDirectory);
       return config.targetDirectory;
@@ -174,6 +177,7 @@ async function getTargetDirectory(parentWindow = null) {
     properties: ["openDirectory"],
     title: "请选择目标目录",
     buttonLabel: "选择此目录",
+    defaultPath: isUpdate ? config.targetDirectory : undefined
   };
 
   // 如果有父窗口，则附加到父窗口
@@ -207,49 +211,6 @@ function updateValue(current, finalKey, targetDir, oldVal, targetId) {
     current[finalKey] = newValue;
 
     logger.info(`✅ newValue to:`, newValue);
-  }
-}
-
-/**
- * 修改 JSON 对象的指定键值（支持嵌套键）
- * @param {Object} jsonData - 要修改的 JSON 对象
- * @param {string} keyPath - 要修改的键的路径（例如 'user.profile.name'）
- * @return {string} newValue - 要设置的新值
- */
-function modifyJsonValue(jsonData, keyPath, targetDir, targetId) {
-  const keys = keyPath.split(".");
-  const lastIndex = keys.length - 1;
-  let current = jsonData;
-  logger.info(`[log] keys:`, jsonData, keys);
-  // 遍历键路径，直到最后一个键之前
-  for (let i = 0; i < lastIndex; i++) {
-    const key = keys[i];
-
-    // logger.info(`[log] current[${key}]:`, current[key]);
-    // 如果路径中的某个键不存在或不是对象，则创建一个空对象（或根据需求抛出错误）
-    if (!current.hasOwnProperty(key) || typeof current[key] !== "object") {
-      return;
-    }
-    current = current[key];
-  }
-
-  if (!current) return;
-
-  // 设置最终键的值
-  const finalKey = keys[lastIndex];
-
-  if (current instanceof Array) {
-    current.forEach((item) => {
-      if (item.hasOwnProperty(finalKey)) {
-        const oldVal = item[finalKey];
-        updateValue(item, finalKey, targetDir, oldVal, targetId);
-      }
-    });
-  } else {
-    const oldVal = current[finalKey];
-    if (oldVal) {
-      updateValue(current, finalKey, targetDir, oldVal, targetId);
-    }
   }
 }
 
@@ -529,7 +490,9 @@ module.exports = {
   readDownloadLog,
   clearDownloadLog,
 
-  clearDefaultDraftPath,
+  updateDraftPath,
+
+  readConfig,
 
   getDraftUrls,
 
