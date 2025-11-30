@@ -51,6 +51,14 @@ module.exports = {
     },
     artifactName: "capcut-mate-macos-apple.dmg"
   },
+  dmg: {
+    // 最简化的 dmg 配置
+    writeUpdateInfo: false,
+    sign: false,
+    format: "UDZO"
+  },
+  compression: "store",
+  forceCodeSigning: false,
   linux: {
     icon: "resources/icon/logo.png"
   }

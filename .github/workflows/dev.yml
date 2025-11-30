@@ -43,6 +43,10 @@ jobs:
 
       - name: 根据平台创建安装包
         run: npm run ${{ matrix.installer_command }}
+        env:
+          # 添加环境变量以解决macOS构建问题
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          DEBUG: electron-builder
 
       - name: 列出dist目录内容
         run: |
