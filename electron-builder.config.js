@@ -3,7 +3,7 @@
  */
 module.exports = {
   appId: "com.gogoshine.capcut-mate",
-  productName: "CapCut Mate",
+  productName: "路飞剪映小助手",
   directories: {
     output: "dist"
   },
