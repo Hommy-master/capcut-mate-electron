@@ -1,17 +1,8 @@
-const { app, BrowserWindow, ipcMain, dialog, nativeImage  } = require('electron');
+const { app, BrowserWindow } = require('electron');
 const path = require('path');
-const fs = require('fs');
 
-const {
-  readDownloadLog,
-  clearDownloadLog,
-  getDraftUrls,
-  updateDraftPath,
-  downloadFiles,
-  readConfig
-} = require('./script/download');
-
-const logger = require("./script/logger");
+// 引入IPC处理程序模块
+const { setupIpcHandlers } = require('./nodeapi/ipcHandlers');
 
 let mainWindow;
 
@@ -21,14 +12,33 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1366,
     height: 768,
+    icon: path.join(__dirname, './assets/icons/logo.ico'),
+    show: false, // 创建窗口但先隐藏，等页面加载完成后再显示
     webPreferences: {
       nodeIntegration: false, // 禁用 Node.js 集成（出于安全考虑，强烈推荐）
       contextIsolation: true, // 启用上下文隔离（Electron 12 后默认 true，推荐开启）
-      preload: path.join(__dirname, 'script', 'preload.js') // 指定预加载脚本的绝对路径
+      preload: path.join(__dirname, 'preload.js'), // 指定预加载脚本的绝对路径
+      // webSecurity: false, // 禁用web安全策略（可选，根据需求调整）
+      disableBlinkFeatures: 'OutOfBlinkCors', // 禁用某些Blink特性以提高性能
+      hardwareAcceleration: true // 启用硬件加速
     }
   });
 
+  
+  if (process.platform==='darwin') {
+    app.dock.setIcon(path.join(__dirname, './assets/icons/logo.png'))
+  }
+
+  // 加载React应用
   mainWindow.loadFile(path.join(__dirname, 'web', 'index.html'));
+
+  // 当页面加载完成后显示窗口
+  mainWindow.webContents.on('ready-to-show', () => {
+    mainWindow.show();
+  });
+
+  // 调用IPC处理程序，传递mainWindow参数
+  setupIpcHandlers(mainWindow);
 
   mainWindow.on('closed', function () {
     mainWindow = null;
@@ -39,61 +49,6 @@ function createWindow() {
 app.whenReady().then(() => {
   createWindow();
 });
-
-ipcMain.handle('get-download-log', async (event) => {
-  return await readDownloadLog();
-});
-
-ipcMain.handle('clear-download-log', async (event) => {
-  return await clearDownloadLog();
-});
-
-ipcMain.handle('get-url-json-data', async (event, remoteUrl) => {
-  try {
-    return await getDraftUrls(remoteUrl, mainWindow);
-  } catch (error) {
-    logger.error(`[error] get draft url:`, error);
-    return {};
-  }
-});
-
-ipcMain.handle('save-file', async (event, config) => {
-  await downloadFiles(config, mainWindow);
-});
-
-ipcMain.handle('show-message-box', async (event, options) => {
-  return await dialog.showMessageBox(mainWindow, {
-    type: options.type || 'info',
-    title: options.title || '提示',
-    message: options.message || '',
-    buttons: ['确定'],
-    noLink: true, // 防止按钮以链接样式显示，这通常会使按钮更小更紧凑
-    normalizeAccessKeys: true // 标准化访问键，确保按钮文本格式一致
-  });
-});
-
-ipcMain.handle('get-config-data', async (event) => {
-  return await readConfig();
-});
-
-// 设置默认草稿路径
-ipcMain.handle('update-draft-path', async (event) => {
-  return await updateDraftPath(mainWindow);
-});
-
-// 在默认浏览器中打开URL
-ipcMain.handle('open-external-url', async (event, url) => {
-  try {
-    const { shell } = require('electron');
-    await shell.openExternal(url);
-    logger.info(`已在默认浏览器中打开URL: ${url}`);
-    return { success: true };
-  } catch (error) {
-    logger.error(`打开URL失败: ${url}`, error);
-    return { success: false, error: error.message };
-  }
-});
-
 
 // 当所有窗口都关闭时退出应用
 app.on('window-all-closed', () => {

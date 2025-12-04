@@ -7,6 +7,19 @@ module.exports = {
   directories: {
     output: "dist"
   },
+  files: [
+    "**/*",
+    "!electron-builder.config.js",
+    "!webpack.config.js",
+    // "!node_modules",
+    "!src",
+    "!public",
+    "!.gitignore",
+    "!.github",
+    "!README.md",
+    "!.vscode",
+    "!DS_Store",
+  ],
   win: {
     icon: "assets/icons/logo.ico",
     target: "nsis",

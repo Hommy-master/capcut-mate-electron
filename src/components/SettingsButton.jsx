@@ -1,0 +1,13 @@
+import React from 'react';
+
+function SettingsButton({ onClick }) {
+  return (
+    <div className="settings-button-container">
+      <button id="settingsBtn" className="btn btn-settings" onClick={onClick}>
+        <i className="fas fa-cog"></i> 设置
+      </button>
+    </div>
+  );
+}
+
+export default SettingsButton;
