@@ -63,20 +63,6 @@ function App() {
     setConfig(prevConfig => ({ ...prevConfig, targetDirectory: newPath }));
   };
 
-  const handleClearDraftPath = async () => {
-    if (window.electronAPI) {
-      try {
-        const result = await window.electronAPI.clearDefaultDraftPath();
-        if (result.success) {
-          setConfig(prevConfig => ({ ...prevConfig, targetDirectory: '' }));
-          // 显示成功消息
-        }
-      } catch (error) {
-        console.error('清除草稿路径失败:', error);
-      }
-    }
-  };
-
   const handleDownload = async () => {
     if (!textareaValue.trim()) {
       // 显示提示消息
@@ -160,8 +146,6 @@ function App() {
       <DownloadControls 
         isOpen={isDownloadOpen} 
         onToggle={setIsDownloadOpen}
-        hasCustomPath={!!config.targetDirectory}
-        onClearPath={handleClearDraftPath}
       />
       
       <DownloadButton onClick={handleDownload} />
