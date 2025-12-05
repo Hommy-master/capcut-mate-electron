@@ -39,5 +39,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getConfigData: () => ipcRenderer.invoke('get-config-data'),
     
     // 设置草稿保存路径
-    updateDraftPath: () => ipcRenderer.invoke('update-draft-path')
+    updateDraftPath: () => ipcRenderer.invoke('update-draft-path'),
+    
+    // 检测URL是否可访问
+    checkUrlAccess: (url) => ipcRenderer.invoke('check-url-access', url)
 });

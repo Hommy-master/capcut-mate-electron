@@ -3,6 +3,8 @@
  * 封装Electron API调用，实现浏览器和Electron环境的兼容
  */
 
+import axios from 'axios';
+
 // 检查是否在Electron环境中
 const isElectron = () => {
   return window && window.electronAPI;
@@ -53,6 +55,21 @@ const mockElectronAPI = {
     console.warn('Electron API not available in browser: updateDraftPath');
     alert('选择路径功能仅在桌面应用中可用');
     return { success: false, message: 'Not available in browser' };
+  },
+  checkUrlAccess: async (url) => {
+    console.warn('Electron API not available in browser: checkUrlAccess');
+    try {
+      // 在浏览器环境中，使用axios请求
+      const response = await axios({
+        method: "HEAD",
+        url: url,
+        timeout: 5000
+      });
+      return { accessible: response.status < 400 };
+    } catch (error) {
+      console.error('Error checking URL accessibility in browser:', error);
+      return { accessible: false };
+    }
   }
 };
 
@@ -78,6 +95,9 @@ const electronAPI = {
   },
   clearDownloadLog: () => {
     window.electronAPI.clearDownloadLog();
+  },
+  checkUrlAccess: async (url) => {
+    return await window.electronAPI.checkUrlAccess(url);
   },
   openExternalUrl: (url) => {
     window.electronAPI.openExternalUrl(url);

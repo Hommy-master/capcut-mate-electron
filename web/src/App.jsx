@@ -6,7 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 
 import electronService from "./services/electronService";
 import SettingsButton from "./components/SettingsButton";
-import Carousel from "./components/Carousel";
+import ExternalWebpage from "./components/ExternalWebpage";
 import Textarea from "./components/Textarea";
 import Tabs from "./components/Tabs";
 import DownloadControls from "./components/DownloadControls";
@@ -21,7 +21,7 @@ function App() {
   const [logs, setLogs] = useState([]);
   const [config, setConfig] = useState({ targetDirectory: "" });
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // 外层容器的ref，用于实现自动滚动
   const mainRef = useRef(null);
 
@@ -42,7 +42,7 @@ function App() {
       }
     };
   }, []);
-  
+
   // 当日志更新时，将外层容器滚动到底部
   useEffect(() => {
     if (mainRef.current) {
@@ -141,19 +141,29 @@ function App() {
 
   return (
     <div className="app">
-      <div
-        className="top-tip"
-        onClick={() => electronService.openExternalUrl("https://jcaigc.cn")}
-      >
-        点击进入官网
+      <div className="top-header">
+        <div className="top-nav">
+          <div className="top-nav-item logo">剪映小助手(免费客户端)</div>
+          <div className="top-nav-group">
+            <div
+            className="top-nav-item"
+            onClick={() => electronService.openExternalUrl("https://jcaigc.cn")}
+          >
+            点击进入官网
+          </div>
+          <div className="top-nav-item" onClick={handleSettingsClick}>设置</div>
+        
+          </div>
+          </div>
       </div>
-      <main className="main-content" ref={mainRef}>        
+      <main className="main-content" ref={mainRef}>
         <div className="container">
-          <SettingsButton onClick={handleSettingsClick} />
+          <ExternalWebpage />
 
-          <Carousel />
-
-          <Textarea value={textareaValue} onChange={(val)=>setTextareaValue(val?.trim())} />
+          <Textarea
+            value={textareaValue}
+            onChange={(val) => setTextareaValue(val?.trim())}
+          />
 
           <Tabs
             onTabChange={(content) => setTextareaValue(content)}

@@ -486,6 +486,22 @@ async function downloadFiles(
   }
 }
 
+async function checkUrlAccessRight(url) {
+  try {
+    const response = await axios({
+      ...axiosConfig,
+      method: 'HEAD',
+      url: url,
+      timeout: 5000
+    });
+    logger.info(`URL Accessibility Check Result: ${url} - ${response.status < 400}`);
+    return { accessible: response.status < 400 };
+  } catch (error) {
+    logger.error(`URL Accessibility Check Failed: ${url}`, error);
+    return { accessible: false, error: error.message };
+  }
+}
+
 module.exports = {
   readDownloadLog,
   clearDownloadLog,
@@ -497,4 +513,6 @@ module.exports = {
   getDraftUrls,
 
   downloadFiles,
+
+  checkUrlAccessRight,
 };

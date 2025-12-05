@@ -11,7 +11,7 @@ function createWindow() {
 
   mainWindow = new BrowserWindow({
     width: 1366,
-    height: 768,
+    height: 868,
     icon: path.join(__dirname, './assets/icons/logo.ico'),
     show: false, // 创建窗口但先隐藏，等页面加载完成后再显示
     webPreferences: {

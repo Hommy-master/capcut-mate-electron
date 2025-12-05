@@ -3,6 +3,9 @@ const { ipcMain, dialog } = require('electron');
 // 引入logger模块
 const logger = require('./logger');
 
+// 引入axios
+const axios = require('axios');
+
 // 引入download.js模块
 const {
   readDownloadLog,
@@ -10,7 +13,8 @@ const {
   getDraftUrls,
   updateDraftPath,
   downloadFiles,
-  readConfig
+  readConfig,
+  checkUrlAccessRight,
 } = require('./download');
 
 console.log(process.versions.electron);
@@ -71,6 +75,11 @@ function setupIpcHandlers(mainWindow) {
       logger.error(`打开URL失败: ${url}`, error);
       return { success: false, error: error.message };
     }
+  });
+  
+  // 检测URL是否可访问
+  ipcMain.handle('check-url-access', async (event, url) => {
+    return await checkUrlAccessRight(url);
   });
 }
 
