@@ -30,7 +30,7 @@ function createWindow() {
   }
 
   // 加载React应用
-  mainWindow.loadFile(path.join(__dirname, 'web', 'index.html'));
+  mainWindow.loadFile(path.join(__dirname, 'ui', 'index.html'));
 
   // 当页面加载完成后显示窗口
   mainWindow.webContents.on('ready-to-show', () => {

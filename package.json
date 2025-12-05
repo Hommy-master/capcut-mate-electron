@@ -5,25 +5,17 @@
   "main": "main.js",
   "scripts": {
     "start": "electron --enable-logging --v=1 .",
-    "build-web": "webpack --config webpack.config.js",
-    "build-win": "electron-packager . CapCut-Mate --platform=win32 --arch=x64 --out dist --overwrite --icon=assets/icons/logo.ico --ignore=webpack.config.js --ignore=electron-builder.config.js --ignore=public --ignore=.gitignore --ignore=.github --ignore=README.md",
-    "build-mac": "electron-packager . CapCut-Mate --platform=darwin --arch=arm64 --out dist --overwrite --icon=assets/icons/logo.icns --ignore=webpack.config.js --ignore=electron-builder.config.js --ignore=public --ignore=.gitignore --ignore=.github --ignore=README.md",
+    "web:install": "npm --prefix web install", 
+    "web:build": "npm --prefix web run build",
+    "build-win": "electron-packager . CapCut-Mate --platform=win32 --arch=x64 --out dist --overwrite --icon=assets/icons/logo.ico --ignore=electron-builder.config.js --ignore=.gitignore --ignore=.github --ignore=README.md  --ignore=web",
+    "build-mac": "electron-packager . CapCut-Mate --platform=darwin --arch=arm64 --out dist --overwrite --icon=assets/icons/logo.icns --ignore=electron-builder.config.js --ignore=.gitignore --ignore=.github --ignore=README.md  --ignore=web",
     "build-win-installer": "electron-builder --win nsis --x64 --config electron-builder.config.js --publish never",
     "build-mac-installer": "electron-builder --mac --arm64 --config electron-builder.config.js --publish never"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
-    "@babel/preset-env": "^7.28.5",
-    "@babel/preset-react": "^7.28.5",
     "@electron/packager": "^18.3.5",
-    "babel-loader": "^10.0.0",
-    "css-loader": "^7.1.2",
     "electron": "31.7.6",
-    "electron-builder": "^24.13.3",
-    "html-webpack-plugin": "^5.6.5",
-    "style-loader": "^4.0.0",
-    "webpack": "^5.103.0",
-    "webpack-cli": "^6.0.1"
+    "electron-builder": "^24.13.3"
   },
   "optionalDependencies": {
     "dmg-license": "^1.0.11"
@@ -31,12 +23,8 @@
   "author": "gogoshine",
   "license": "MIT",
   "dependencies": {
-    "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3",
     "axios": "^1.11.0",
     "electron-download-manager": "^2.1.2",
-    "log4js": "^6.9.1",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "log4js": "^6.9.1"
   }
 }

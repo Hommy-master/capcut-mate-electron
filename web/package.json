@@ -1,0 +1,27 @@
+{
+  "name": "@sd/web",
+  "version": "0.0.100",
+  "description": "剪映小助手，用于下载剪映草稿",
+  "scripts": {
+    "dev": "webpack --config webpack.config.js --watch",
+    "build": "webpack --config webpack.config.js"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-react": "^7.28.5",
+    "babel-loader": "^10.0.0",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.5",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.103.0",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "axios": "^1.11.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}
