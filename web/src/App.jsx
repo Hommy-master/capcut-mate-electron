@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import "react-toastify/dist/ReactToastify.css";
 
@@ -21,6 +21,9 @@ function App() {
   const [logs, setLogs] = useState([]);
   const [config, setConfig] = useState({ targetDirectory: "" });
   const [isLoading, setIsLoading] = useState(false);
+  
+  // 外层容器的ref，用于实现自动滚动
+  const mainRef = useRef(null);
 
   // 加载配置
   useEffect(() => {
@@ -39,6 +42,13 @@ function App() {
       }
     };
   }, []);
+  
+  // 当日志更新时，将外层容器滚动到底部
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTop = mainRef.current.scrollHeight;
+    }
+  }, [logs]);
 
   const loadConfig = async () => {
     try {
@@ -114,6 +124,8 @@ function App() {
         return;
       }
 
+      setLogs([]);
+
       await electronService.saveFile({
         remoteFileUrls: matchedFiles,
         targetId,
@@ -135,41 +147,42 @@ function App() {
       >
         点击进入官网
       </div>
-      <div className="container">
-        <SettingsButton onClick={handleSettingsClick} />
+      <main className="main-content" ref={mainRef}>        
+        <div className="container">
+          <SettingsButton onClick={handleSettingsClick} />
 
-        <Carousel />
+          <Carousel />
 
-        <Textarea value={textareaValue} onChange={(val)=>setTextareaValue(val?.trim())} />
+          <Textarea value={textareaValue} onChange={(val)=>setTextareaValue(val?.trim())} />
 
-        <Tabs
-          onTabChange={(content) => setTextareaValue(content)}
-          initialContent={textareaValue}
-        />
+          <Tabs
+            onTabChange={(content) => setTextareaValue(content)}
+            initialContent={textareaValue}
+          />
 
-        <DownloadControls
-          isOpen={isDownloadOpen}
-          isLoading={isLoading}
-          onToggle={setIsDownloadOpen}
-        />
+          <DownloadControls
+            isOpen={isDownloadOpen}
+            isLoading={isLoading}
+            onToggle={setIsDownloadOpen}
+          />
 
-        <DownloadButton
-          onClick={handleDownload}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-          textValue={textareaValue}
-        />
+          <DownloadButton
+            onClick={handleDownload}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            textValue={textareaValue}
+          />
 
-        <LogModule logs={logs} onClear={handleClearLogs} />
+          <LogModule logs={logs} onClear={handleClearLogs} />
 
-        <SettingsWindow
-          isOpen={showSettings}
-          onClose={handleCloseSettings}
-          currentPath={config.targetDirectory}
-          onPathUpdate={handlePathUpdate}
-        />
-      </div>
-
+          <SettingsWindow
+            isOpen={showSettings}
+            onClose={handleCloseSettings}
+            currentPath={config.targetDirectory}
+            onPathUpdate={handlePathUpdate}
+          />
+        </div>
+      </main>
       <ToastContainer style={{ top: "55px" }} />
     </div>
   );
