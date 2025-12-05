@@ -35,8 +35,8 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: 安装依赖
-        run: npm ci
+      - name: 安装Electron依赖 & 安装前端依赖 & 构建前端
+        run: npm ci && npm run web:ci && npm run web:build
 
       - name: 根据平台打包应用程序
         run: npm run ${{ matrix.build_command }}
