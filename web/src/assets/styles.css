@@ -627,20 +627,6 @@ i.log-icon.error {
     justify-content: flex-end;
 }
 
-.btn-primary {
-    padding: 10px 20px;
-    background-color: #27ae60;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.btn-primary:hover {
-    background-color: #229954;
-}
-
 @media (min-width: 992px) {
     .container {
         max-width: 960px;
