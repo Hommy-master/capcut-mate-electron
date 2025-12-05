@@ -1,18 +1,17 @@
 import React from 'react';
+import electronService from '../services/electronService';
 
 function SettingsWindow({ isOpen, onClose, currentPath, onPathUpdate }) {
   if (!isOpen) return null;
 
   const handleSelectPath = async () => {
-    if (window.electronAPI) {
-      try {
-        const result = await window.electronAPI.updateDraftPath();
-        if (result.success) {
-          onPathUpdate(result.targetDir);
-        }
-      } catch (error) {
-        console.error('选择路径失败:', error);
+    try {
+      const result = await electronService.updateDraftPath();
+      if (result.success) {
+        onPathUpdate(result.targetDir);
       }
+    } catch (error) {
+      console.error('选择路径失败:', error);
     }
   };
 

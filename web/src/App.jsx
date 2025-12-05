@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import electronService from './services/electronService';
 import SettingsButton from './components/SettingsButton';
 import Carousel from './components/Carousel';
 import Textarea from './components/Textarea';
@@ -20,34 +21,30 @@ function App() {
     loadConfig();
     loadLogs();
     // 监听日志更新
-    if (window.electronAPI) {
-      window.electronAPI.onFileOperationLog((logEntry) => {
-        setLogs(prevLogs => [...prevLogs, logEntry]);
-      });
-    }
+    const unsubscribe = electronService.onFileOperationLog((logEntry) => {
+      setLogs(prevLogs => [...prevLogs, logEntry]);
+    });
+    
+    return () => unsubscribe();
   }, []);
 
   const loadConfig = async () => {
-    if (window.electronAPI) {
-      try {
-        const configData = await window.electronAPI.getConfigData();
-        setConfig(configData || { targetDirectory: '' });
-      } catch (error) {
-        console.error('加载配置失败:', error);
-      }
+    try {
+      const configData = await electronService.getConfigData();
+      setConfig(configData || { targetDirectory: '' });
+    } catch (error) {
+      console.error('加载配置失败:', error);
     }
   };
 
   const loadLogs = async () => {
-    if (window.electronAPI) {
-      try {
-        const logData = await window.electronAPI.getDownloadLog();
-        if (logData && logData.length > 0) {
-          setLogs(logData);
-        }
-      } catch (error) {
-        console.error('加载日志失败:', error);
+    try {
+      const logData = await electronService.getDownloadLog();
+      if (logData && logData.length > 0) {
+        setLogs(logData);
       }
+    } catch (error) {
+      console.error('加载日志失败:', error);
     }
   };
 
@@ -87,45 +84,41 @@ function App() {
       return;
     }
 
-    if (window.electronAPI) {
-      try {
-        const jsonData = await window.electronAPI.getUrlJsonData(value);
-        if (jsonData?.code !== 0 || !jsonData?.files) {
-          // 显示错误消息
-          return;
-        }
-
-        const matchedFiles = jsonData.files.filter(fileUrl => 
-          fileUrl.includes(targetId)
-        );
-
-        if (matchedFiles.length === 0) {
-          // 显示错误消息
-          return;
-        }
-
-        await window.electronAPI.saveFile({
-          remoteFileUrls: matchedFiles,
-          targetId,
-          isOpenDir: isDownloadOpen,
-        });
-      } catch (error) {
-        console.error('保存文件失败:', error);
+    try {
+      const jsonData = await electronService.getUrlJsonData(value);
+      if (jsonData?.code !== 0 || !jsonData?.files) {
         // 显示错误消息
+        return;
       }
+
+      const matchedFiles = jsonData.files.filter(fileUrl => 
+        fileUrl.includes(targetId)
+      );
+
+      if (matchedFiles.length === 0) {
+        // 显示错误消息
+        return;
+      }
+
+      await electronService.saveFile({
+        remoteFileUrls: matchedFiles,
+        targetId,
+        isOpenDir: isDownloadOpen,
+      });
+    } catch (error) {
+      console.error('保存文件失败:', error);
+      // 显示错误消息
     }
   };
 
   const handleClearLogs = () => {
     setLogs([]);
-    if (window.electronAPI) {
-      window.electronAPI.clearDownloadLog();
-    }
+    electronService.clearDownloadLog();
   };
 
   return (
     <div className="container">
-      <div className="top-tip" onClick={() => window.electronAPI?.openExternalUrl('https://jcaigc.cn')}>
+      <div className="top-tip" onClick={() => electronService.openExternalUrl('https://jcaigc.cn')}>
         点击进入官网
       </div>
       
