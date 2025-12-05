@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
 
 function DownloadButton({ onClick, isLoading, setIsLoading, textValue }) {
-
   const handleClick = async () => {
     setIsLoading(true);
     try {
@@ -18,7 +16,9 @@ function DownloadButton({ onClick, isLoading, setIsLoading, textValue }) {
         onClick={handleClick}
         disabled={isLoading || !textValue}
       >
-        <i className={`fas ${isLoading ? 'fa-spinner fa-spin' : 'fa-download'}`}></i>
+        <i
+          className={`fas ${isLoading ? "fa-spinner fa-spin" : "fa-download"}`}
+        ></i>
         创建剪映草稿
       </button>
     </section>

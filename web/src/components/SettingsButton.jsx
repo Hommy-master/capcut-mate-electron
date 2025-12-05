@@ -1,5 +1,3 @@
-import React from 'react';
-
 function SettingsButton({ onClick }) {
   return (
     <div className="settings-button-container">

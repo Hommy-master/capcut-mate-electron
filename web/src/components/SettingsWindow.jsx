@@ -1,4 +1,4 @@
-import React from 'react';
+import { toast } from 'react-toastify';
 import electronService from '../services/electronService';
 
 function SettingsWindow({ isOpen, onClose, currentPath, onPathUpdate }) {
@@ -11,7 +11,7 @@ function SettingsWindow({ isOpen, onClose, currentPath, onPathUpdate }) {
         onPathUpdate(result.targetDir);
       }
     } catch (error) {
-      console.error('选择路径失败:', error);
+      toast.error('选择路径失败:', error);
     }
   };
 

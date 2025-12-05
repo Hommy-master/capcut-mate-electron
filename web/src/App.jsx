@@ -73,7 +73,7 @@ function App() {
   };
 
   const handleDownload = async () => {
-    if (!textareaValue.trim()) {
+    if (!textareaValue) {
       toast.warn("请输入草稿地址，多个使用回车换行分隔");
       return;
     }
@@ -94,14 +94,14 @@ function App() {
     const targetId = urlParams.get("draft_id");
 
     if (!targetId) {
-      // 显示提示消息
+      toast.warn(`${value} 中缺少 draft_id 参数`);
       return;
     }
 
     try {
       const jsonData = await electronService.getUrlJsonData(value);
       if (jsonData?.code !== 0 || !jsonData?.files) {
-        toast.error("获取文件列表失败");
+        toast.error("获取文件列表失败，请确保您输入的地址可正常访问");
         return;
       }
 
@@ -110,7 +110,7 @@ function App() {
       );
 
       if (matchedFiles.length === 0) {
-        toast.error("未找到匹配的文件");
+        toast.error("未找到包含 draft_id 的文件");
         return;
       }
 
@@ -125,10 +125,7 @@ function App() {
     }
   };
 
-  const handleClearLogs = () => {
-    setLogs([]);
-    // electronService.clearDownloadLog();
-  };
+  const handleClearLogs = () => setLogs([]);
 
   return (
     <div className="app">
@@ -143,7 +140,7 @@ function App() {
 
         <Carousel />
 
-        <Textarea value={textareaValue} onChange={setTextareaValue} />
+        <Textarea value={textareaValue} onChange={(val)=>setTextareaValue(val?.trim())} />
 
         <Tabs
           onTabChange={(content) => setTextareaValue(content)}
@@ -160,7 +157,7 @@ function App() {
           onClick={handleDownload}
           isLoading={isLoading}
           setIsLoading={setIsLoading}
-          textValue={textareaValue.trim()}
+          textValue={textareaValue}
         />
 
         <LogModule logs={logs} onClear={handleClearLogs} />

@@ -1,5 +1,3 @@
-import React from 'react';
-
 function DownloadControls({ isOpen, onToggle, isLoading }) {
   return (
     <section className="module flex space-between">
