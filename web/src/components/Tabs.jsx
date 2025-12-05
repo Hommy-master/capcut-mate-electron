@@ -4,15 +4,15 @@ function Tabs({ onTabChange, initialContent }) {
   const templates = {
     template1: {
       title: "案例一",
-      content: "https://cm.jcaigc.cn/openapi/v1/get_draft?draft_id=2025090716400922f559b4"
+      content: "https://capcut-mate.jcaigc.cn/openapi/capcut-mate/v1/get_draft?draft_id=20251204214904ccb1af38"
     },
     template2: {
       title: "案例二",
-      content: "https://cm.jcaigc.cn/openapi/v1/get_draft?draft_id=202509151914009cdf8766"
+      content: "https://capcut-mate.jcaigc.cn/openapi/capcut-mate/v1/get_draft?draft_id=2025120421372636a27729"
     }
   };
 
-  const [activeTab, setActiveTab] = useState('template1');
+  const [activeTab, setActiveTab] = useState('');
 
   const handleTabClick = (templateId) => {
     setActiveTab(templateId);
@@ -22,7 +22,7 @@ function Tabs({ onTabChange, initialContent }) {
   return (
     <section className="module tabs-module">
       <span><i className="fas fa-folder-open"></i> 案例草稿：</span>
-      <div className="tabs" id="tabContainer">
+      <div className="tabs">
         {Object.entries(templates).map(([key, template]) => (
           <button
             key={key}

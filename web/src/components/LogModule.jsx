@@ -1,34 +1,30 @@
-import React from 'react';
+import { formatToTime } from '../utils/date';
 
 function LogModule({ logs, onClear }) {
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleString('zh-CN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
+  const logIconMap = {
+      // info: "fas fa-info-circle",
+      // success: "fas fa-check-circle",
+      error: "fas fa-times-circle",
+      // loading: "fas fa-spinner fa-spin",
+      all: "fas fa-check-circle", // check-square
   };
-
   return (
     <section className="module log-module">
       <h2 className="module-title">
         <span><i className="fas fa-list-alt"></i> 下载日志</span>
-        <button id="clearLogBtn" className="btn btn-clear" onClick={onClear}>
+        <button className="btn btn-clear" onClick={onClear}>
           <i className="fas fa-trash"></i> 清空日志
         </button>
       </h2>
       {logs.length === 0 ? (
-        <div className="log-empty" id="emptyLog">暂无日志记录</div>
+        <div className="log-empty">暂无日志记录</div>
       ) : (
-        <ul className="log-list" id="downloadLog">
+        <ul className="log-list">
           {logs.map((log, index) => (
-            <li key={index}>
-              <span className="log-time">{formatDate(log.timestamp)}</span>
-              <span className={`log-message log-${log.type || 'info'}`}>
+            <li key={index} className={`log-item ${log.level}`}>
+              <span className="log-time">[{formatToTime(log.time)}]</span>
+              <i className={`log-icon show ${logIconMap[log.level] || 'hide'}`}></i>
+              <span className={`log-message`}>
                 {log.message}
               </span>
             </li>

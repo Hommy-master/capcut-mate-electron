@@ -58,7 +58,7 @@ async function readDownloadLog() {
 
 /**
  *
- * @param {*} entry { level: 'error', message: '日志内容' }
+ * @param {*} entry {time: Date, level: 'error', message: '日志内容' }
  */
 async function appendDownloadLog(entry, parentWindow) {
   const logPath = getDownloadLogPath();
@@ -69,11 +69,11 @@ async function appendDownloadLog(entry, parentWindow) {
     // 如果文件不存在或无法读取，初始化为空数组
     logs = [];
   }
-  logs.push(entry);
 
-  const now = new Date();
-  entry.time = `${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+  entry.time = new Date();
+  console.log(`appendDownloadLog: ${JSON.stringify(entry)}`);
   await parentWindow.webContents.send("file-operation-log", entry);
+  logs.push(entry);
   try {
     await fs.writeFile(logPath, JSON.stringify(logs, null, 2), "utf8");
   } catch (writeErr) {

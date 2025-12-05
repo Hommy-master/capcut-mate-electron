@@ -22,12 +22,16 @@ const mockElectronAPI = {
     console.warn('Electron API not available in browser: onFileOperationLog');
     return () => {}; // 返回空的卸载函数
   },
+  removeAllFileOperationLogListeners: () => {
+    console.warn('Electron API not available in browser: removeAllFileOperationLogListeners');
+  },
   getUrlJsonData: async (url) => {
     console.warn('Electron API not available in browser: getUrlJsonData');
     // 在浏览器环境中，可以直接使用axios请求
     try {
-      const response = await fetch(url);
-      return response.json();
+      // const response = await fetch(url);
+      // return response.json();
+      return {};
     } catch (error) {
       console.error('Error fetching data in browser:', error);
       return { code: -1, message: 'Browser fetch failed' };
@@ -55,19 +59,22 @@ const mockElectronAPI = {
 // 实际的Electron API（用于Electron环境）
 const electronAPI = {
   getConfigData: async () => {
-    return window.electronAPI.getConfigData();
+    return await window.electronAPI.getConfigData();
   },
   getDownloadLog: async () => {
-    return window.electronAPI.getDownloadLog();
+    return await window.electronAPI.getDownloadLog();
   },
-  onFileOperationLog: (callback) => {
-    return window.electronAPI.onFileOperationLog(callback);
+  onFileOperationLog: async (callback) => {
+    return await window.electronAPI.onFileOperationLog(callback);
+  },
+  removeAllFileOperationLogListeners: () => {
+    window.electronAPI.removeAllFileOperationLogListeners();
   },
   getUrlJsonData: async (url) => {
-    return window.electronAPI.getUrlJsonData(url);
+    return await window.electronAPI.getUrlJsonData(url);
   },
   saveFile: async (options) => {
-    return window.electronAPI.saveFile(options);
+    return await window.electronAPI.saveFile(options);
   },
   clearDownloadLog: () => {
     window.electronAPI.clearDownloadLog();
@@ -76,11 +83,11 @@ const electronAPI = {
     window.electronAPI.openExternalUrl(url);
   },
   updateDraftPath: async () => {
-    return window.electronAPI.updateDraftPath();
+    return await window.electronAPI.updateDraftPath();
   }
 };
 
 // 根据环境选择使用哪个API实现
-const electronService = isElectron() ? electronAPI : mockElectronAPI;
+const electronService = isElectron() && window.electronAPI ? electronAPI : mockElectronAPI;
 
 export default electronService;

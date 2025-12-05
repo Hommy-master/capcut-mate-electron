@@ -1,52 +1,64 @@
-import { useState, useEffect } from 'react';
-import electronService from './services/electronService';
-import SettingsButton from './components/SettingsButton';
-import Carousel from './components/Carousel';
-import Textarea from './components/Textarea';
-import Tabs from './components/Tabs';
-import DownloadControls from './components/DownloadControls';
-import DownloadButton from './components/DownloadButton';
-import LogModule from './components/LogModule';
-import SettingsWindow from './components/SettingsWindow';
+import { useState, useEffect } from "react";
+
+import "react-toastify/dist/ReactToastify.css";
+
+import { ToastContainer, toast } from "react-toastify";
+
+import electronService from "./services/electronService";
+import SettingsButton from "./components/SettingsButton";
+import Carousel from "./components/Carousel";
+import Textarea from "./components/Textarea";
+import Tabs from "./components/Tabs";
+import DownloadControls from "./components/DownloadControls";
+import DownloadButton from "./components/DownloadButton";
+import LogModule from "./components/LogModule";
+import SettingsWindow from "./components/SettingsWindow";
 
 function App() {
   const [showSettings, setShowSettings] = useState(false);
-  const [textareaValue, setTextareaValue] = useState('');
+  const [textareaValue, setTextareaValue] = useState("");
   const [isDownloadOpen, setIsDownloadOpen] = useState(true);
   const [logs, setLogs] = useState([]);
-  const [config, setConfig] = useState({ targetDirectory: '' });
+  const [config, setConfig] = useState({ targetDirectory: "" });
+  const [isLoading, setIsLoading] = useState(false);
 
   // 加载配置
   useEffect(() => {
-    loadConfig();
-    loadLogs();
     // 监听日志更新
-    const unsubscribe = electronService.onFileOperationLog((logEntry) => {
-      setLogs(prevLogs => [...prevLogs, logEntry]);
+    electronService.onFileOperationLog((logEntry) => {
+      setLogs((prevLogs) => [...prevLogs, logEntry]);
     });
-    
-    return () => unsubscribe();
+
+    loadConfig();
+
+    return () => {
+      try {
+        electronService.removeAllFileOperationLogListeners();
+      } catch (error) {
+        console.error("取消订阅日志失败:", error);
+      }
+    };
   }, []);
 
   const loadConfig = async () => {
     try {
       const configData = await electronService.getConfigData();
-      setConfig(configData || { targetDirectory: '' });
+      setConfig(configData || { targetDirectory: "" });
     } catch (error) {
-      console.error('加载配置失败:', error);
+      console.error("加载配置失败:", error);
     }
   };
 
-  const loadLogs = async () => {
-    try {
-      const logData = await electronService.getDownloadLog();
-      if (logData && logData.length > 0) {
-        setLogs(logData);
-      }
-    } catch (error) {
-      console.error('加载日志失败:', error);
-    }
-  };
+  // const loadLogs = async () => {
+  //   try {
+  //     const logData = await electronService.getDownloadLog();
+  //     if (logData && logData.length > 0) {
+  //       setLogs(logData);
+  //     }
+  //   } catch (error) {
+  //     console.error("加载日志失败:", error);
+  //   }
+  // };
 
   const handleSettingsClick = () => {
     setShowSettings(true);
@@ -57,16 +69,16 @@ function App() {
   };
 
   const handlePathUpdate = (newPath) => {
-    setConfig(prevConfig => ({ ...prevConfig, targetDirectory: newPath }));
+    setConfig((prevConfig) => ({ ...prevConfig, targetDirectory: newPath }));
   };
 
   const handleDownload = async () => {
     if (!textareaValue.trim()) {
-      // 显示提示消息
+      toast.warn("请输入草稿地址，多个使用回车换行分隔");
       return;
     }
 
-    const valArray = textareaValue.split('\n').map(line => line.trim());
+    const valArray = textareaValue.split("\n").map((line) => line.trim());
     for (const val of valArray) {
       if (val) {
         await saveFile(val);
@@ -76,8 +88,10 @@ function App() {
 
   const saveFile = async (value) => {
     // 从URL中提取draft_id
-    const urlParams = new URLSearchParams(value.includes('?') ? value.split('?')[1] : '');
-    const targetId = urlParams.get('draft_id');
+    const urlParams = new URLSearchParams(
+      value.includes("?") ? value.split("?")[1] : ""
+    );
+    const targetId = urlParams.get("draft_id");
 
     if (!targetId) {
       // 显示提示消息
@@ -87,16 +101,16 @@ function App() {
     try {
       const jsonData = await electronService.getUrlJsonData(value);
       if (jsonData?.code !== 0 || !jsonData?.files) {
-        // 显示错误消息
+        toast.error("获取文件列表失败");
         return;
       }
 
-      const matchedFiles = jsonData.files.filter(fileUrl => 
+      const matchedFiles = jsonData.files.filter((fileUrl) =>
         fileUrl.includes(targetId)
       );
 
       if (matchedFiles.length === 0) {
-        // 显示错误消息
+        toast.error("未找到匹配的文件");
         return;
       }
 
@@ -105,55 +119,61 @@ function App() {
         targetId,
         isOpenDir: isDownloadOpen,
       });
+      toast.success(`剪映草稿下载完成！请前往剪映查看`);
     } catch (error) {
-      console.error('保存文件失败:', error);
-      // 显示错误消息
+      toast.error("保存文件失败", error);
     }
   };
 
   const handleClearLogs = () => {
     setLogs([]);
-    electronService.clearDownloadLog();
+    // electronService.clearDownloadLog();
   };
 
   return (
-    <div className="container">
-      <div className="top-tip" onClick={() => electronService.openExternalUrl('https://jcaigc.cn')}>
+    <div className="app">
+      <div
+        className="top-tip"
+        onClick={() => electronService.openExternalUrl("https://jcaigc.cn")}
+      >
         点击进入官网
       </div>
-      
-      <SettingsButton onClick={handleSettingsClick} />
-      
-      <Carousel />
-      
-      <Textarea 
-        value={textareaValue} 
-        onChange={setIsDownloadOpen} 
-      />
-      
-      <Tabs 
-        onTabChange={content => setTextareaValue(content)} 
-        initialContent={textareaValue}
-      />
-      
-      <DownloadControls 
-        isOpen={isDownloadOpen} 
-        onToggle={setIsDownloadOpen}
-      />
-      
-      <DownloadButton onClick={handleDownload} />
-      
-      <LogModule 
-        logs={logs} 
-        onClear={handleClearLogs} 
-      />
-      
-      <SettingsWindow 
-        isOpen={showSettings} 
-        onClose={handleCloseSettings} 
-        currentPath={config.targetDirectory}
-        onPathUpdate={handlePathUpdate}
-      />
+      <div className="container">
+        <SettingsButton onClick={handleSettingsClick} />
+
+        <Carousel />
+
+        <Textarea value={textareaValue} onChange={setTextareaValue} />
+
+        <Tabs
+          onTabChange={(content) => setTextareaValue(content)}
+          initialContent={textareaValue}
+        />
+
+        <DownloadControls
+          isOpen={isDownloadOpen}
+          isLoading={isLoading}
+          onToggle={setIsDownloadOpen}
+        />
+
+        <DownloadButton
+          onClick={handleDownload}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+          textValue={textareaValue.trim()}
+        />
+
+        <LogModule logs={logs} onClear={handleClearLogs} />
+
+        <SettingsWindow
+          isOpen={showSettings}
+          onClose={handleCloseSettings}
+          currentPath={config.targetDirectory}
+          onPathUpdate={handlePathUpdate}
+        />
+      </div>
+
+      <ToastContainer style={{ top: "55px" }} />
     </div>
   );
 }

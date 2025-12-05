@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-function DownloadButton({ onClick }) {
-  const [isLoading, setIsLoading] = useState(false);
+function DownloadButton({ onClick, isLoading, setIsLoading, textValue }) {
 
   const handleClick = async () => {
     setIsLoading(true);
@@ -14,14 +13,13 @@ function DownloadButton({ onClick }) {
 
   return (
     <section className="module">
-      <button 
-        id="downloadBtn" 
+      <button
         className="btn btn-download"
         onClick={handleClick}
-        disabled={isLoading}
+        disabled={isLoading || !textValue}
       >
         <i className={`fas ${isLoading ? 'fa-spinner fa-spin' : 'fa-download'}`}></i>
-        {' '}创建剪映草稿
+        创建剪映草稿
       </button>
     </section>
   );

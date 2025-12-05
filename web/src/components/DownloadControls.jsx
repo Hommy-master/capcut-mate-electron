@@ -1,14 +1,14 @@
 import React from 'react';
 
-function DownloadControls({ isOpen, onToggle }) {
+function DownloadControls({ isOpen, onToggle, isLoading }) {
   return (
     <section className="module flex space-between">
       <div className="switch-container">
         <label className="switch">
           <input 
-            type="checkbox" 
-            id="downloadToggle" 
+            type="checkbox"
             checked={isOpen} 
+            disabled={isLoading}
             onChange={(e) => onToggle(e.target.checked)}
           />
           <span className="slider"></span>

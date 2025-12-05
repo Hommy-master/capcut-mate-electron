@@ -29,8 +29,19 @@ function createWindow() {
     app.dock.setIcon(path.join(__dirname, './assets/icons/logo.png'))
   }
 
+  // 判断是否为开发模式
+  const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
+  
   // 加载React应用
-  mainWindow.loadFile(path.join(__dirname, 'ui', 'index.html'));
+  if (isDev) {
+    // 开发模式下加载本地web服务
+    mainWindow.loadURL('http://localhost:9003');
+    // 开发模式下打开开发者工具
+    mainWindow.webContents.openDevTools();
+  } else {
+    // 生产模式下加载构建后的文件
+    mainWindow.loadFile(path.join(__dirname, 'ui', 'index.html'));
+  }
 
   // 当页面加载完成后显示窗口
   mainWindow.webContents.on('ready-to-show', () => {
