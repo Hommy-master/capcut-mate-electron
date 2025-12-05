@@ -5,10 +5,13 @@
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-html, body, #root, .app {
+html,
+body,
+#root,
+.app {
     height: 100%;
     width: 100%;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 body {
@@ -22,7 +25,8 @@ body {
 }
 
 .top-header {
-    background: linear-gradient(135deg, #356bfd 0%, #1a50d9 100%);;
+    background: linear-gradient(135deg, #356bfd 0%, #1a50d9 100%);
+    ;
     color: #fff;
     padding: 12px 16px;
     text-align: right;
@@ -31,6 +35,7 @@ body {
     position: fixed;
     z-index: 1;
 }
+
 .top-nav {
     display: flex;
     justify-content: space-between;
@@ -40,6 +45,7 @@ body {
     color: rgba(255, 255, 255, .8);
     transition: color 0.3s ease;
 }
+
 .top-nav-group {
     display: flex;
     justify-content: end;
@@ -47,15 +53,17 @@ body {
     flex-direction: row;
     gap: 16px;
 }
+
 .top-nav-item.logo {
     font-size: 20px;
 }
+
 .top-nav-item:hover {
     color: #fff;
 }
 
 
-.main-content {    
+.main-content {
     padding: 72px 20px 20px;
     width: 100%;
     height: 100%;
@@ -146,8 +154,13 @@ h1 {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* 默认静态广告样式 */
@@ -628,19 +641,20 @@ i.log-icon.error {
     background-color: #229954;
 }
 
-
-
-/* 响应式设计 */
-@media (max-width: 480px) {
-    .carousel {
-        height: 200px;
+@media (min-width: 992px) {
+    .container {
+        max-width: 960px;
     }
+}
 
-    .tabs {
-        flex-direction: column;
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1140px;
     }
+}
 
-    .tab-btn {
-        width: 100%;
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1320px;
     }
 }

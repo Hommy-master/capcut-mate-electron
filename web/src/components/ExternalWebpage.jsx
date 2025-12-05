@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import electronService from "../services/electronService";
 
-const externalUrl = "http://localhost:8008/external-features";
+const externalUrl = "http://jcaigc.cn/external-features";
 
 function ExternalWebpage() {
-  const [iframeHeight, setIframeHeight] = useState("300px"); // 默认高度
-  const [isAccessible, setIsAccessible] = useState(null); // null: 未检测, true: 可访问, false: 不可访问
+  const [iframeHeight, setIframeHeight] = useState("240px");
+  const [isAccessible, setIsAccessible] = useState(null);
   
   const checkAccessibility = async () => {
     try {
