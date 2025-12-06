@@ -35,7 +35,7 @@ function createWindow() {
   // 加载React应用
   if (isDev) {
     // 开发模式下加载本地web服务
-    mainWindow.loadURL('http://localhost:9003');
+    mainWindow.loadURL('http://localhost:9000');
     // 开发模式下打开开发者工具
     mainWindow.webContents.openDevTools();
   } else {
