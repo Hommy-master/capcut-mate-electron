@@ -70,7 +70,11 @@ const mockElectronAPI = {
       console.error('Error checking URL accessibility in browser:', error);
       return { accessible: false };
     }
-  }
+  },
+  getHistoryRecord: async () => {
+    console.warn('Electron API not available in browser: getHistoryRecord');
+    return [];
+  },
 };
 
 // 实际的Electron API（用于Electron环境）
@@ -104,7 +108,10 @@ const electronAPI = {
   },
   updateDraftPath: async () => {
     return await window.electronAPI.updateDraftPath();
-  }
+  },
+  getHistoryRecord: async () => {
+    return await window.electronAPI.getHistoryRecord();
+  },
 };
 
 // 根据环境选择使用哪个API实现

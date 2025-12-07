@@ -15,6 +15,7 @@ const {
   downloadFiles,
   readConfig,
   checkUrlAccessRight,
+  readHistoryRecord,
 } = require('./download');
 
 console.log(process.versions.electron);
@@ -80,6 +81,10 @@ function setupIpcHandlers(mainWindow) {
   // 检测URL是否可访问
   ipcMain.handle('check-url-access', async (event, url) => {
     return await checkUrlAccessRight(url);
+  });
+
+  ipcMain.handle('get-history-record', async (event) => {
+    return await readHistoryRecord();
   });
 }
 

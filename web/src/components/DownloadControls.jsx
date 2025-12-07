@@ -1,6 +1,6 @@
 function DownloadControls({ isOpen, onToggle, isLoading }) {
   return (
-    <section className="module flex space-between">
+    <section className="module flex justify-between">
       <div className="switch-container">
         <label className="switch">
           <input 

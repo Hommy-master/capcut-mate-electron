@@ -42,5 +42,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     updateDraftPath: () => ipcRenderer.invoke('update-draft-path'),
     
     // 检测URL是否可访问
-    checkUrlAccess: (url) => ipcRenderer.invoke('check-url-access', url)
+    checkUrlAccess: (url) => ipcRenderer.invoke('check-url-access', url),
+    
+    getHistoryRecord: () => ipcRenderer.invoke('get-history-record'),
 });

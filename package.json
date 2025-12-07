@@ -6,13 +6,13 @@
   "scripts": {
     "start": "electron --enable-logging --v=1 .",
     "web:dev": "npm --prefix web run dev",
-    "web:ci": "npm --prefix web ci", 
-    "web:i": "npm --prefix web install", 
+    "web:ci": "npm --prefix web ci",
+    "web:i": "npm --prefix web install",
     "web:build": "npm --prefix web run build",
     "build-win": "electron-packager . CapCut-Mate --platform=win32 --arch=x64 --out dist --overwrite --icon=assets/icons/logo.ico --ignore=.gitignore --ignore=.github --ignore=README.md --ignore=scripts --ignore=web",
     "build-mac": "electron-packager . CapCut-Mate --platform=darwin --arch=arm64 --out dist --overwrite --icon=assets/icons/logo.icns --ignore=.gitignore --ignore=.github --ignore=README.md --ignore=scripts --ignore=web",
     "build-win-installer": "electron-builder --win nsis --x64 --config ./scripts/electron-builder.config.js --publish never",
-    "build-mac-installer": "electron-builder --mac --arm64 --config ./scripts/electron-builder.config.js --publish never" 
+    "build-mac-installer": "electron-builder --mac --arm64 --config ./scripts/electron-builder.config.js --publish never"
   },
   "devDependencies": {
     "@electron/packager": "^18.3.5",
@@ -26,6 +26,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^1.11.0",
-    "log4js": "^6.9.1"
+    "log4js": "^6.9.1",
+    "uuid": "^8.3.2"
   }
 }

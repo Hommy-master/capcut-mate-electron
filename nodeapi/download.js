@@ -4,6 +4,11 @@ const { app, dialog, shell } = require("electron");
 const { createWriteStream } = require("fs");
 const fs = require("fs").promises; // 使用 fs.promises 进行异步文件操作
 const logger = require("./logger");
+const { v4: uuidv4 } = require('uuid');
+
+const RECORD_MAX = 500;
+
+const LOG_MAX = 2000;
 
 const axiosConfig = {
   method: "GET",
@@ -74,6 +79,9 @@ async function appendDownloadLog(entry, parentWindow) {
   console.log(`appendDownloadLog: ${JSON.stringify(entry)}`);
   await parentWindow.webContents.send("file-operation-log", entry);
   logs.push(entry);
+  if (logs.length > LOG_MAX) {
+    logs.shift();
+  }
   try {
     await fs.writeFile(logPath, JSON.stringify(logs, null, 2), "utf8");
   } catch (writeErr) {
@@ -89,6 +97,47 @@ async function clearDownloadLog() {
   } catch (error) {
     logger.error("清空日志文件失败:", error);
     return false;
+  }
+}
+
+function getHistoryRecordPath() {
+  return path.join(app.getPath("userData"), "history-record.json");
+}
+
+async function readHistoryRecord() {
+  const recordPath = getHistoryRecordPath();
+  console.info("[History] Record path:", recordPath);
+  try {
+    const data = await fs.readFile(recordPath, "utf8");
+    return JSON.parse(data);
+  } catch (error) {
+    return [];
+  }
+}
+
+/**
+ *
+ * @param {*} entry {id: 'uuid', time: Date, draft_id: 'draft_id' draft_url: 'draft_url' }
+ */
+async function appendHistoryRecord(entry) {
+  const recordPath = getHistoryRecordPath();
+  let records = [];
+  try {
+    records = await readHistoryRecord();
+  } catch (error) {
+    // 如果文件不存在或无法读取，初始化为空数组
+    records = [];
+  }
+
+  console.log(`appendHistoryRecord: ${JSON.stringify(entry)}`);
+  records.push(entry);
+  if (records.length > RECORD_MAX) {
+    records.shift();
+  }
+  try {
+    await fs.writeFile(recordPath, JSON.stringify(records, null, 2), "utf8");
+  } catch (writeErr) {
+    console.error("写入草稿历史记录文件失败:", writeErr);
   }
 }
 
@@ -135,7 +184,7 @@ async function getDraftUrls(remoteUrl, parentWindow) {
 async function updateDraftPath(parentWindow) {
   const targetDir = await getTargetDirectory(parentWindow, true);
   if (!targetDir) {
-    throw new Error("用户取消了目录选择");
+    return { success: false, error: "用户取消了目录选择" };
   }
   try {
     const configPath = getConfigPath();
@@ -193,7 +242,7 @@ async function getTargetDirectory(parentWindow = null, isUpdate = false) {
     await writeConfig(config);
     return selectedDir;
   } else {
-    throw new Error("用户取消了目录选择");
+    return '';
   }
 }
 
@@ -374,7 +423,7 @@ async function openDraftDirectory(dirPath) {
 }
 
 async function downloadFiles(
-  { remoteFileUrls, targetId, isOpenDir },
+  { sourceUrl, remoteFileUrls, targetId, isOpenDir },
   parentWindow
 ) {
   try {
@@ -382,15 +431,20 @@ async function downloadFiles(
     // 然后获取目标目录，将主窗口作为父窗口传递
     try {
       baseTargetDir = await getTargetDirectory(parentWindow);
-      logger.info("[log] get target dir:", baseTargetDir);
     } catch (error) {
       logger.error("[log] get target dir fail:", error);
+      baseTargetDir = '';
+    }
+
+    if (!baseTargetDir) {
       await appendDownloadLog(
         { level: "error", message: `获取目录失败：${error}` },
         parentWindow
       );
       return;
     }
+
+    logger.info("[log] get target dir:", baseTargetDir);
 
     await appendDownloadLog(
       { level: "info", message: `创建剪映草稿目录：${targetId}` },
@@ -465,6 +519,14 @@ async function downloadFiles(
       },
       parentWindow
     );
+
+    // {id: 'uuid', time: Date, draft_id: 'draft_id', draft_url: 'draft_url' }
+    await appendHistoryRecord({
+      id: uuidv4(),
+      time: new Date(),
+      draft_id: targetId,
+      draft_url: sourceUrl,
+    });
     const jointPath = path.join(baseTargetDir, targetId);
     logger.info(`[finish] all download: ${jointPath}`);
     if (isOpenDir) await openDraftDirectory(jointPath);
@@ -494,7 +556,7 @@ async function checkUrlAccessRight(url) {
       url: url,
       timeout: 5000
     });
-    logger.info(`URL Accessibility Check Result: ${url} - ${response.status < 400}`);
+    logger.info(`URL Accessibility Check Result: ${url} - ${response.status}`);
     return { accessible: response.status < 400 };
   } catch (error) {
     logger.error(`URL Accessibility Check Failed: ${url}`, error);
@@ -515,4 +577,6 @@ module.exports = {
   downloadFiles,
 
   checkUrlAccessRight,
+
+  readHistoryRecord
 };
