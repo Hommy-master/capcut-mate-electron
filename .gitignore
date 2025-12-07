@@ -1,5 +1,6 @@
 /node_modules
 /dist
+/ui
 /logs
 app-config.json
 download-log.json
