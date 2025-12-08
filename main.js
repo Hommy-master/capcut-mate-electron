@@ -1,5 +1,6 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const logger = require('./script/logger');
 
 // 引入IPC处理程序模块
 const { setupIpcHandlers } = require('./nodeapi/ipcHandlers');
