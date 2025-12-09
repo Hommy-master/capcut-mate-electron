@@ -21,6 +21,7 @@ npm install --verbose
 ```
 2. 启动项目
 ```bash
+npm run web:dev
 npm start
 ```
 
