@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches: [ main ]
-    tags: [ 'v*' ]
+    tags: [ '*' ]
   pull_request:
     branches: [ main ]
 
@@ -37,6 +37,11 @@ jobs:
 
       - name: 安装Electron依赖 & 安装前端依赖 & 构建前端
         run: npm ci && npm run web:ci && npm run web:build
+
+      - name: 更新版本号
+        run: node scripts/update-version.js
+        env:
+          GITHUB_REF: ${{ github.ref }}
 
       - name: 根据平台打包应用程序
         run: npm run ${{ matrix.build_command }}
