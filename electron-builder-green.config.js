@@ -4,7 +4,7 @@
  */
 module.exports = {
   appId: "com.gogoshine.capcut-mate",
-  productName: "路飞剪映小助手",
+  productName: "capcut-mate", // Changed from Chinese to avoid path length issues on macOS
   directories: {
     output: "dist"
   },
@@ -59,7 +59,5 @@ module.exports = {
       }
     ]
   },
-  extraResources: [
-    "**/*"
-  ]
+
 };
