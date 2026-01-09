@@ -19,11 +19,13 @@ jobs:
             artifact_name: windows-build
             build_command: build-win
             installer_command: build-win-installer
+            green_command: build-win-green
           - os: macos-latest
             platform: mac
             artifact_name: macos-build
             build_command: build-mac
             installer_command: build-mac-installer
+            green_command: build-mac-green
 
     steps:
       - name: 准备代码
@@ -48,17 +50,31 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: false
           DEBUG: electron-builder
 
+      - name: 根据平台创建绿色安装包
+        run: npm run ${{ matrix.green_command }}
+        env:
+          # 添加环境变量以解决macOS构建问题
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          DEBUG: electron-builder
+
       - name: 列出dist目录内容
         run: |
           echo "当前操作系统: ${{ runner.os }}"
-          ls dist/
+          ls -la dist/
         shell: bash
 
-      - name: 上传安装包构件
+      - name: 上传完整安装包构件
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}-installer
-          path: dist/
+          path: dist/*installer*
+          if-no-files-found: ignore
+
+      - name: 上传绿色安装包构件
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}-green
+          path: dist/*.zip
           if-no-files-found: ignore
 
       - name: 发布版本
@@ -70,6 +86,8 @@ jobs:
           files: |
             dist/capcut-mate-windows-x64-installer.exe
             dist/capcut-mate-macos-arm64-installer.dmg
+            dist/capcut-mate-windows-x64.zip
+            dist/capcut-mate-macos-arm64.zip
           overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

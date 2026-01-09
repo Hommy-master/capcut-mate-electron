@@ -7,9 +7,13 @@ module.exports = {
   directories: {
     output: "dist"
   },
+  files: ["**/*"],
+  extraMetadata: {
+    version: "${version}"
+  },
   win: {
     icon: "assets/icons/logo.ico",
-    target: "nsis",
+    target: ["nsis", "zip"],
     artifactName: "capcut-mate-windows-x64-installer.exe",
     // 禁用代码签名
     signingHashAlgorithms: []
@@ -18,9 +22,12 @@ module.exports = {
     oneClick: false,
     allowToChangeInstallationDirectory: true,
   },
+  portable: {
+    artifactName: "capcut-mate-windows-x64-portable.exe"
+  },
   mac: {
     icon: "assets/icons/logo.icns",
-    target: "dmg",
+    target: ["dmg", "zip"],
     artifactName: "capcut-mate-macos-arm64-installer.dmg",
     category: "public.app-category.productivity"
   },
@@ -43,5 +50,15 @@ module.exports = {
         path: "/Applications"
       }
     ]
+  },
+  win: {
+    zip: {
+      artifactName: "capcut-mate-windows-x64.zip"
+    }
+  },
+  mac: {
+    zip: {
+      artifactName: "capcut-mate-macos-arm64.zip"
+    }
   }
 };
