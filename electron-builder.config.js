@@ -13,7 +13,7 @@ module.exports = {
   },
   win: {
     icon: "assets/icons/logo.ico",
-    target: ["nsis", "zip"],
+    target: ["nsis"],
     artifactName: "capcut-mate-windows-x64-installer.exe",
     // 禁用代码签名
     signingHashAlgorithms: []
@@ -27,7 +27,7 @@ module.exports = {
   },
   mac: {
     icon: "assets/icons/logo.icns",
-    target: ["dmg", "zip"],
+    target: ["dmg"],
     artifactName: "capcut-mate-macos-arm64-installer.dmg",
     category: "public.app-category.productivity"
   },
@@ -51,14 +51,10 @@ module.exports = {
       }
     ]
   },
-  win: {
-    zip: {
-      artifactName: "capcut-mate-windows-x64.zip"
-    }
+  zip: {
+    artifactName: "capcut-mate-${platform}-${arch}.zip"
   },
-  mac: {
-    zip: {
-      artifactName: "capcut-mate-macos-arm64.zip"
-    }
-  }
+  extraResources: [
+    "**/*"
+  ]
 };

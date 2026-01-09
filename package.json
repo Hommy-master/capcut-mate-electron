@@ -9,8 +9,8 @@
     "build-mac": "electron-packager . CapCut-Mate --platform=darwin --arch=arm64 --out=dist --overwrite --icon=assets/icons/logo.icns",
     "build-win-installer": "electron-builder --win nsis --x64 --config electron-builder.config.js --publish never",
     "build-mac-installer": "electron-builder --mac --arm64 --config electron-builder.config.js --publish never",
-    "build-win-green": "electron-builder --win zip --x64 --config electron-builder.config.js --publish never",
-    "build-mac-green": "electron-builder --mac zip --arm64 --config electron-builder.config.js --publish never"
+    "build-win-green": "electron-builder --win zip --x64 --config electron-builder.config.js --config.artifactName=capcut-mate-windows-x64.zip --publish never",
+    "build-mac-green": "electron-builder --mac zip --arm64 --config electron-builder.config.js --config.artifactName=capcut-mate-macos-arm64.zip --publish never"
   },
   "devDependencies": {
     "electron": "31.7.6",
