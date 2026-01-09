@@ -15,9 +15,7 @@ module.exports = {
     "!electron-builder-green.config.js",
     "!*.+(md|MD)"
   ],
-  extraMetadata: {
-    version: "${version}"
-  },
+
   win: {
     icon: "assets/icons/logo.ico",
     target: ["nsis"],
