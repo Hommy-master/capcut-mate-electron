@@ -7,7 +7,14 @@ module.exports = {
   directories: {
     output: "dist"
   },
-  files: ["**/*"],
+  files: [
+    "**/*",
+    "!dist/**/*",
+    "!node_modules/**/*",
+    "!electron-builder.config.js",
+    "!electron-builder-green.config.js",
+    "!*.+(md|MD)"
+  ],
   extraMetadata: {
     version: "${version}"
   },
