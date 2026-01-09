@@ -1,5 +1,6 @@
 /**
- * Electron Builder Configuration
+ * Electron Builder Configuration for Green Packages
+ * This configuration is used specifically for building ZIP format packages
  */
 module.exports = {
   appId: "com.gogoshine.capcut-mate",
@@ -13,8 +14,8 @@ module.exports = {
   },
   win: {
     icon: "assets/icons/logo.ico",
-    target: ["nsis"],
-    artifactName: "capcut-mate-windows-x64-installer.exe",
+    target: "zip",
+    artifactName: "capcut-mate-windows-x64.zip",
     // 禁用代码签名
     signingHashAlgorithms: []
   },
@@ -27,8 +28,8 @@ module.exports = {
   },
   mac: {
     icon: "assets/icons/logo.icns",
-    target: ["dmg"],
-    artifactName: "capcut-mate-macos-arm64-installer.dmg",
+    target: "zip",
+    artifactName: "capcut-mate-macos-arm64.zip",
     category: "public.app-category.productivity"
   },
   dmg: {
