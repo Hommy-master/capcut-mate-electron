@@ -10,7 +10,11 @@ module.exports = {
   files: [
     "**/*",
     "!dist/**/*",
-    "!node_modules/**/*",
+    "!node_modules/electron/**/*",
+    "!node_modules/electron-builder/**/*",
+    "!node_modules/@electron/**/*",
+    "!node_modules/**/*.md",
+    "!node_modules/**/*.map",
     "!electron-builder.config.js",
     "!electron-builder-green.config.js",
     "!*.+(md|MD)"
