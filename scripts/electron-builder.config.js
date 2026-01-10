@@ -3,11 +3,21 @@
  */
 module.exports = {
   appId: "com.gogoshine.capcut-mate",
-  productName: "capcut-mate", // Changed from Chinese to avoid path length issues on macOS
+  productName: "剪映小助手",
   directories: {
     output: "dist"
   },
   files: [
+    "**/*",
+    // "!node_modules",
+    "!web",
+    "!dist",
+    "!electron-builder.config.js",
+    "!.gitignore",
+    "!.github",
+    "!README.md",
+    "!.vscode",
+    "!DS_Store",
     "**/*",
     "!dist/**/*",
     "!node_modules/electron/**/*",
@@ -19,7 +29,6 @@ module.exports = {
     "!electron-builder-green.config.js",
     "!*.+(md|MD)"
   ],
-
   win: {
     icon: "assets/icons/logo.ico",
     target: ["nsis"],

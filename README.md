@@ -1,7 +1,15 @@
 # 1. 简介
 使用electron实现剪映小助手客户端，用于下载剪映草稿
 
-# 2. 启动方法
+# 2. 相关项目与资源
+
+## 剪映小助手相关项目
+- 服务端开源项目：[https://github.com/Hommy-master/capcut-mate](https://github.com/Hommy-master/capcut-mate)
+- 扣子插件：[https://www.coze.cn/store/plugin/7576197869707722771](https://www.coze.cn/store/plugin/7576197869707722771)
+
+⭐ 如果您觉得这个项目对您有点帮助，麻烦点个 Star 支持一下！您的支持是我持续维护和改进项目的最大动力 😊
+
+# 3. 启动方法
 1. 安装依赖
 ```bash
 # 切换npm镜像源 - 适用于windows
@@ -13,6 +21,7 @@ npm install --verbose
 ```
 2. 启动项目
 ```bash
+npm run web:dev
 npm start
 ```
 
