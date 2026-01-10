@@ -76,7 +76,7 @@ async function appendDownloadLog(entry, parentWindow) {
   }
 
   entry.time = new Date();
-  console.log(`appendDownloadLog: ${JSON.stringify(entry)}`);
+  // Removed console.log in production
   await parentWindow.webContents.send("file-operation-log", entry);
   logs.push(entry);
   if (logs.length > LOG_MAX) {
@@ -129,7 +129,7 @@ async function appendHistoryRecord(entry) {
     records = [];
   }
 
-  console.log(`appendHistoryRecord: ${JSON.stringify(entry)}`);
+  // Removed console.log in production
   records.push(entry);
   if (records.length > RECORD_MAX) {
     records.shift();
@@ -137,7 +137,7 @@ async function appendHistoryRecord(entry) {
   try {
     await fs.writeFile(recordPath, JSON.stringify(records, null, 2), "utf8");
   } catch (writeErr) {
-    console.error("写入草稿历史记录文件失败:", writeErr);
+    logger.error("写入草稿历史记录文件失败:", writeErr);
   }
 }
 

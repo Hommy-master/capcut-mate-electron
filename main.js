@@ -7,13 +7,28 @@ const { setupIpcHandlers } = require('./nodeapi/ipcHandlers');
 
 let mainWindow;
 
+// 获取适用于当前平台的应用图标路径
+function getAppIconPath() {
+  let iconPath = '';
+  
+  if (process.platform === 'win32') {
+    iconPath = './assets/icons/logo.ico';
+  } else if (process.platform === 'darwin') {
+    iconPath = './assets/icons/logo.icns';
+  } else {
+    iconPath = './assets/icons/logo.png';
+  }
+  
+  return path.join(__dirname, iconPath);
+}
+
 function createWindow() {
   mainWindow = null;
 
   mainWindow = new BrowserWindow({
     width: 1366,
     height: 868,
-    icon: path.join(__dirname, './assets/icons/logo.ico'),
+    icon: getAppIconPath(),
     show: false, // 创建窗口但先隐藏，等页面加载完成后再显示
     webPreferences: {
       nodeIntegration: false, // 禁用 Node.js 集成（出于安全考虑，强烈推荐）
@@ -26,8 +41,8 @@ function createWindow() {
   });
 
   
-  if (process.platform==='darwin') {
-    app.dock.setIcon(path.join(__dirname, './assets/icons/logo.png'))
+  if (process.platform === 'darwin') {
+    app.dock.setIcon(path.join(__dirname, './assets/icons/logo.icns'))
   }
 
   // 判断是否为开发模式
